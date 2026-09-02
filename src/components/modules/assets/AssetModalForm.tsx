@@ -12,7 +12,7 @@ interface AssetModalFormProps {
 
 export function AssetModalForm({ isOpen, onClose, onSubmit }: AssetModalFormProps) {
   const [formData, setFormData] = useState<CreateAssetInput>({
-    asset_tag: `AST-SOBHA-${Math.floor(100 + Math.random() * 900)}`,
+    asset_tag: `AST-XSTACK-${Math.floor(100 + Math.random() * 900)}`,
     name: '',
     machine_type: 'CNC Processing Center',
     model: '',
@@ -34,12 +34,12 @@ export function AssetModalForm({ isOpen, onClose, onSubmit }: AssetModalFormProp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const finalTag = formData.asset_tag.trim() || `AST-SOBHA-${Date.now().toString().slice(-4)}`;
+    const finalTag = formData.asset_tag.trim() || `AST-XSTACK-${Date.now().toString().slice(-4)}`;
     
     await onSubmit({
       ...formData,
       asset_tag: finalTag,
-      qr_code: `SOBHA-${finalTag}`,
+      qr_code: `XSTACK-${finalTag}`,
       installation_date: formData.installation_date || '',
       warranty_expiry: formData.warranty_expiry || '',
     });
@@ -55,7 +55,7 @@ export function AssetModalForm({ isOpen, onClose, onSubmit }: AssetModalFormProp
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div>
             <h2 className="text-base font-bold text-slate-900">Add New Machinery Asset</h2>
-            <p className="text-xs text-slate-500">Register an asset into Sobha Furniture Plant Master</p>
+            <p className="text-xs text-slate-500">Register an asset into Plant Master Catalog</p>
           </div>
           <button
             onClick={onClose}

@@ -6,8 +6,8 @@ import { AuthProvider } from '@/context/AuthContext';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Sobha Furniture CMMS',
-  description: 'Plant Maintenance & Asset Management System for Sobha Furniture',
+  title: 'XStack CMMS',
+  description: 'Plant Maintenance & Asset Management System',
 };
 
 export default function RootLayout({
