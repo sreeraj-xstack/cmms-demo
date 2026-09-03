@@ -4,9 +4,11 @@ import React, { useState } from 'react';
 import { BreakdownTicket, TicketStatus, ManagerApprovalStatus } from '@/types/breakdownTicket';
 import { StatusProgressBar } from './StatusProgressBar';
 import { StatusStepModal } from './StatusStepModal';
+import { PublishTicketSolutionModal } from './PublishTicketSolutionModal';
 import { useAuth } from '@/context/AuthContext';
 import { addTicketComment } from '@/lib/services/breakdownTicketService';
-import { X, MapPin, Clock, CheckCircle2, XCircle, Paperclip, UserCheck, MessageSquare, Send, ArrowRight, User, MessageCircle } from 'lucide-react';
+import { X, MapPin, Clock, CheckCircle2, XCircle, Paperclip, UserCheck, MessageSquare, Send, ArrowRight, User, Sparkles, BookOpen, Lock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface TicketDetailsDrawerProps {
   ticket: BreakdownTicket | null;
@@ -22,13 +24,17 @@ export function TicketDetailsDrawer({
   onManagerApproval,
 }: TicketDetailsDrawerProps) {
   const { user } = useAuth();
+  const router = useRouter();
   const [managerNotes, setManagerNotes] = useState('');
   const [assignedEngineer, setAssignedEngineer] = useState('');
   const [generalComment, setGeneralComment] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [isStepModalOpen, setIsStepModalOpen] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
   if (!ticket) return null;
+
+  const isFixedOrClosed = ticket.status === 'fixed' || ticket.status === 'closed';
 
   const handleApprove = async () => {
     setActionLoading(true);
@@ -68,6 +74,10 @@ export function TicketDetailsDrawer({
     setActionLoading(false);
   };
 
+  const handleFindAISolution = () => {
+    router.push(`/solution-library?search=${encodeURIComponent(ticket.issue_type || ticket.description)}`);
+  };
+
   // Only display general user comments in the comments box (stage changes go exclusively into Audit History)
   const generalComments = (ticket.comments || []).filter((c) => c.comment_type === 'general');
 
@@ -101,8 +111,8 @@ export function TicketDetailsDrawer({
           {/* 7-Stage Status Pipeline Visual Tracker */}
           <StatusProgressBar currentStatus={ticket.status} />
 
-          {/* Action Row: Advance Pipeline Modal */}
-          <div>
+          {/* Action Row: Advance Pipeline Modal & Solution Actions */}
+          <div className="space-y-2">
             <button
               onClick={() => setIsStepModalOpen(true)}
               className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 text-xs transition-all shadow-xs"
@@ -110,6 +120,35 @@ export function TicketDetailsDrawer({
               <span>Advance Pipeline Stage / Add Step Note</span>
               <ArrowRight className="h-4 w-4 text-amber-400" />
             </button>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleFindAISolution}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-stone-50 hover:bg-stone-100 text-slate-800 font-bold py-2 text-xs transition-all"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-amber-500 animate-pulse" />
+                Find AI Solution
+              </button>
+
+              {isFixedOrClosed ? (
+                <button
+                  onClick={() => setIsPublishModalOpen(true)}
+                  className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 text-xs shadow-xs transition-all"
+                >
+                  <BookOpen className="h-3.5 w-3.5 text-slate-950" />
+                  Publish to Library
+                </button>
+              ) : (
+                <button
+                  disabled
+                  title="Ticket must be Fixed or Closed to publish verified solution"
+                  className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-stone-100 border border-slate-200 text-slate-400 font-semibold py-2 text-xs cursor-not-allowed opacity-60"
+                >
+                  <Lock className="h-3.5 w-3.5 text-slate-400" />
+                  Publish to Library
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Manager Approval Panel */}
@@ -328,6 +367,13 @@ export function TicketDetailsDrawer({
         ticketNumber={ticket.ticket_number}
         onClose={() => setIsStepModalOpen(false)}
         onConfirm={handleStepModalConfirm}
+      />
+
+      {/* Publish Ticket Solution Modal */}
+      <PublishTicketSolutionModal
+        isOpen={isPublishModalOpen}
+        ticket={ticket}
+        onClose={() => setIsPublishModalOpen(false)}
       />
     </div>
   );
