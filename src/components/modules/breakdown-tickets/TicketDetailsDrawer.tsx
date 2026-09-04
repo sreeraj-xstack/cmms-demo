@@ -5,9 +5,10 @@ import { BreakdownTicket, TicketStatus, ManagerApprovalStatus } from '@/types/br
 import { StatusProgressBar } from './StatusProgressBar';
 import { StatusStepModal } from './StatusStepModal';
 import { PublishTicketSolutionModal } from './PublishTicketSolutionModal';
+import { CreateWorkorderModal } from '../workorders/CreateWorkorderModal';
 import { useAuth } from '@/context/AuthContext';
 import { addTicketComment } from '@/lib/services/breakdownTicketService';
-import { X, MapPin, Clock, CheckCircle2, XCircle, Paperclip, UserCheck, MessageSquare, Send, ArrowRight, User, Sparkles, BookOpen, Lock } from 'lucide-react';
+import { X, MapPin, Clock, CheckCircle2, XCircle, Paperclip, UserCheck, MessageSquare, Send, ArrowRight, User, Sparkles, BookOpen, Lock, Calendar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface TicketDetailsDrawerProps {
@@ -31,6 +32,7 @@ export function TicketDetailsDrawer({
   const [actionLoading, setActionLoading] = useState(false);
   const [isStepModalOpen, setIsStepModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [isCreateWoModalOpen, setIsCreateWoModalOpen] = useState(false);
 
   if (!ticket) return null;
 
@@ -113,13 +115,23 @@ export function TicketDetailsDrawer({
 
           {/* Action Row: Advance Pipeline Modal & Solution Actions */}
           <div className="space-y-2">
-            <button
-              onClick={() => setIsStepModalOpen(true)}
-              className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 text-xs transition-all shadow-xs"
-            >
-              <span>Advance Pipeline Stage / Add Step Note</span>
-              <ArrowRight className="h-4 w-4 text-amber-400" />
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setIsStepModalOpen(true)}
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 text-xs transition-all shadow-xs"
+              >
+                <span>Advance Pipeline Stage</span>
+                <ArrowRight className="h-4 w-4 text-amber-400" />
+              </button>
+
+              <button
+                onClick={() => setIsCreateWoModalOpen(true)}
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 text-xs transition-all shadow-xs"
+              >
+                <Calendar className="h-4 w-4 text-slate-950" />
+                <span>Create Work Order</span>
+              </button>
+            </div>
 
             <div className="flex items-center gap-2">
               <button
@@ -374,6 +386,17 @@ export function TicketDetailsDrawer({
         isOpen={isPublishModalOpen}
         ticket={ticket}
         onClose={() => setIsPublishModalOpen(false)}
+      />
+
+      {/* Create Work Order Modal */}
+      <CreateWorkorderModal
+        isOpen={isCreateWoModalOpen}
+        initialTicket={ticket}
+        onClose={() => setIsCreateWoModalOpen(false)}
+        onWorkorderCreated={async () => {
+          setIsCreateWoModalOpen(false);
+          onClose();
+        }}
       />
     </div>
   );
