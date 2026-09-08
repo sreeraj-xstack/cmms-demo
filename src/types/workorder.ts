@@ -14,7 +14,7 @@ export interface AssignedTechnician {
 }
 
 export interface SparePartItem {
-  id: string;
+  id?: string;
   part_name: string;
   part_number: string;
   quantity: number;
@@ -22,10 +22,29 @@ export interface SparePartItem {
 }
 
 export interface ToolItem {
+  id?: string;
+  tool_name: string;
+  quantity: number;
+  status?: 'assigned' | 'returned';
+}
+
+export interface WorkOrderPart {
   id: string;
+  work_order_id: string;
+  part_name: string;
+  part_number: string;
+  quantity: number;
+  unit_cost: number;
+  created_at: string;
+}
+
+export interface WorkOrderTool {
+  id: string;
+  work_order_id: string;
   tool_name: string;
   quantity: number;
   status: 'assigned' | 'returned';
+  created_at: string;
 }
 
 export interface WorkOrderProcedureStep {
@@ -87,6 +106,7 @@ export interface WorkOrder {
   breakdown_ticket?: BreakdownTicket;
   procedure_id?: string;
   procedure?: WorkProcedure;
+  procedure_version_id?: string;
   work_type: WorkOrderType;
   priority: WorkOrderPriority;
   status: WorkOrderStatus;
@@ -97,6 +117,8 @@ export interface WorkOrder {
   assigned_technicians: AssignedTechnician[];
   tools_required: ToolItem[];
   spare_parts_required: SparePartItem[];
+  parts?: WorkOrderPart[];
+  tools?: WorkOrderTool[];
   is_rework: boolean;
   parent_work_order_id?: string;
   created_by_user_id?: string;

@@ -11,6 +11,19 @@ export interface WorkProcedureStep {
   created_at?: string;
 }
 
+export interface ProcedureVersion {
+  id: string;
+  procedure_id: string;
+  version_number: number;
+  title: string;
+  description: string;
+  safety_ppe_notes?: string;
+  total_estimated_minutes: number;
+  steps_snapshot: WorkProcedureStep[];
+  created_by_name: string;
+  created_at: string;
+}
+
 export interface WorkProcedure {
   id: string;
   procedure_number: string;
@@ -24,6 +37,7 @@ export interface WorkProcedure {
   created_at: string;
   updated_at: string;
   steps?: WorkProcedureStep[];
+  versions?: ProcedureVersion[];
 }
 
 export interface CreateStepInput {

@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { WorkProcedure } from '@/types/workProcedure';
 import { getWorkProcedures } from '@/lib/services/workProcedureService';
 import { CreateProcedureModal } from './CreateProcedureModal';
-import { Search, Plus, CheckSquare, Clock, ShieldAlert, FileText, ChevronRight, Sparkles } from 'lucide-react';
+import { Modal } from '@/components/ui/Modal';
+import { Search, Plus, CheckSquare, Clock, ShieldAlert, ChevronRight } from 'lucide-react';
 
 export function WorkProceduresList() {
   const [procedures, setProcedures] = useState<WorkProcedure[]>([]);
@@ -105,7 +106,7 @@ export function WorkProceduresList() {
                     {proc.procedure_number}
                   </span>
                   <span className="text-[11px] font-semibold text-slate-500 bg-stone-100 px-2 py-0.5 rounded-md flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-slate-400" /> {proc.total_estimated_minutes} mins (4.05)
+                    <Clock className="h-3 w-3 text-slate-400" /> {proc.total_estimated_minutes} mins
                   </span>
                 </div>
 
@@ -141,69 +142,62 @@ export function WorkProceduresList() {
 
       {/* View Procedure Drawer Modal */}
       {selectedProcedure && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden my-8">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-stone-50">
-              <div>
-                <span className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                  {selectedProcedure.procedure_number}
-                </span>
-                <h2 className="text-base font-bold text-slate-900 mt-1">{selectedProcedure.title}</h2>
-              </div>
-              <button onClick={() => setSelectedProcedure(null)} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
-                ✕
-              </button>
+        <Modal
+          isOpen={Boolean(selectedProcedure)}
+          onClose={() => setSelectedProcedure(null)}
+          title={selectedProcedure.title}
+          subtitle={`SOP Code: ${selectedProcedure.procedure_number}`}
+          icon={<CheckSquare className="h-5 w-5 text-amber-600" />}
+          maxWidth="2xl"
+        >
+          <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <div className="flex items-center justify-between text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200">
+              <span>Category: <strong className="text-slate-800">{selectedProcedure.machine_category}</strong></span>
+              <span>Estimated Time: <strong className="text-slate-800">{selectedProcedure.total_estimated_minutes} minutes</strong></span>
+              <span>Created by: <strong className="text-slate-800">{selectedProcedure.created_by_name}</strong></span>
             </div>
 
-            <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-              <div className="flex items-center justify-between text-xs text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <span>Category: <strong className="text-slate-800">{selectedProcedure.machine_category}</strong></span>
-                <span>Estimated Time: <strong className="text-slate-800">{selectedProcedure.total_estimated_minutes} minutes</strong></span>
-                <span>Created by: <strong className="text-slate-800">{selectedProcedure.created_by_name}</strong></span>
-              </div>
+            <p className="text-xs text-slate-700 bg-stone-50 p-3 rounded-xl">{selectedProcedure.description}</p>
 
-              <p className="text-xs text-slate-700 bg-stone-50 p-3 rounded-xl">{selectedProcedure.description}</p>
-
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Step-by-Step Procedure Checklist</h3>
               <div className="space-y-2">
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Step-by-Step Procedure Checklist</h3>
-                <div className="space-y-2">
-                  {(selectedProcedure.steps || []).map((step) => (
-                    <div key={step.id} className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-900">
-                          Step #{step.step_number}: {step.step_title}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          {step.is_mandatory && (
-                            <span className="text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded-xs">
-                              MANDATORY (4.02)
-                            </span>
-                          )}
-                          {step.requires_photo_proof && (
-                            <span className="text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded-xs">
-                              PHOTO PROOF (4.03)
-                            </span>
-                          )}
-                          <span className="text-[10px] text-slate-400 font-semibold">{step.estimated_minutes}m</span>
-                        </div>
+                {(selectedProcedure.steps || []).map((step) => (
+                  <div key={step.id} className="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-900">
+                        Step #{step.step_number}: {step.step_title}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {step.is_mandatory && (
+                          <span className="text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded-xs">
+                            MANDATORY
+                          </span>
+                        )}
+                        {step.requires_photo_proof && (
+                          <span className="text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded-xs">
+                            PHOTO PROOF
+                          </span>
+                        )}
+                        <span className="text-[10px] text-slate-400 font-semibold">{step.estimated_minutes}m</span>
                       </div>
-                      <p className="text-xs text-slate-600">{step.instructions}</p>
                     </div>
-                  ))}
-                </div>
+                    <p className="text-xs text-slate-600">{step.instructions}</p>
+                  </div>
+                ))}
               </div>
-            </div>
-
-            <div className="px-6 py-3 border-t border-slate-100 bg-stone-50 flex justify-end">
-              <button
-                onClick={() => setSelectedProcedure(null)}
-                className="px-4 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-xl"
-              >
-                Close View
-              </button>
             </div>
           </div>
-        </div>
+
+          <div className="px-6 py-3 border-t border-slate-100 bg-stone-50 flex justify-end">
+            <button
+              onClick={() => setSelectedProcedure(null)}
+              className="px-4 py-1.5 bg-slate-900 text-white text-xs font-semibold rounded-xl"
+            >
+              Close View
+            </button>
+          </div>
+        </Modal>
       )}
 
       {/* Create Modal */}

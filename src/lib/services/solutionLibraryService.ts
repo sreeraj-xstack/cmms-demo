@@ -155,25 +155,21 @@ export async function publishSolutionFromTicket(
 }
 
 /**
- * Upvotes / increments success counter when an engineer verifies the solution worked
+ * Upvotes / increments success counter atomically via PostgreSQL RPC procedure
  */
 export async function incrementSolutionSuccessCount(solutionId: string): Promise<number> {
   const supabase = createClient();
   try {
-    const { data: existing } = await supabase
-      .from('solution_library')
-      .select('success_count')
-      .eq('id', solutionId)
-      .single();
+    const { data, error } = await supabase.rpc('rpc_increment_solution_success', {
+      p_solution_id: solutionId,
+    });
 
-    const newCount = (existing?.success_count || 0) + 1;
+    if (error) {
+      console.error('Error in rpc_increment_solution_success:', error.message);
+      return 1;
+    }
 
-    await supabase
-      .from('solution_library')
-      .update({ success_count: newCount, updated_at: new Date().toISOString() })
-      .eq('id', solutionId);
-
-    return newCount;
+    return (data || 1) as number;
   } catch (err) {
     console.error('Exception incrementing success count:', err);
     return 1;

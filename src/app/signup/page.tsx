@@ -130,20 +130,20 @@ export default function SignupPage() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-700">
-                Select User Role
+                Select Operational Role
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => setRole('manager')}
+                  onClick={() => setRole('operator')}
                   className={`flex flex-col items-center justify-center rounded-xl border p-2.5 transition-all text-xs ${
-                    role === 'manager'
+                    role === 'operator'
                       ? 'border-amber-500 bg-amber-50 text-amber-900 font-semibold shadow-xs'
                       : 'border-slate-200 bg-stone-50 text-slate-600'
                   }`}
                 >
                   <Shield className="h-4 w-4 mb-1 text-amber-500" />
-                  Manager
+                  Machine Operator
                 </button>
 
                 <button
@@ -156,22 +156,12 @@ export default function SignupPage() {
                   }`}
                 >
                   <Shield className="h-4 w-4 mb-1 text-amber-500" />
-                  Engineer
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setRole('operator')}
-                  className={`flex flex-col items-center justify-center rounded-xl border p-2.5 transition-all text-xs ${
-                    role === 'operator'
-                      ? 'border-amber-500 bg-amber-50 text-amber-900 font-semibold shadow-xs'
-                      : 'border-slate-200 bg-stone-50 text-slate-600'
-                  }`}
-                >
-                  <Shield className="h-4 w-4 mb-1 text-amber-500" />
-                  Operator
+                  Maintenance Engineer
                 </button>
               </div>
+              <p className="text-[10px] text-slate-400 italic pt-1">
+                Note: Plant Manager roles are assigned via Admin invitation.
+              </p>
             </div>
 
             <button

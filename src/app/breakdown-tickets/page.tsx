@@ -77,8 +77,7 @@ export default function BreakdownTicketsPage() {
 
   const handleStatusChange = async (ticketId: string, newStatus: TicketStatus, notes?: string) => {
     const userName = user?.full_name || user?.email?.split('@')[0] || 'Maintenance User';
-    const userRole = user?.role || 'engineer';
-    await updateTicketStatus(ticketId, newStatus, userName, userRole, notes);
+    await updateTicketStatus(ticketId, newStatus, userName, notes);
     if (selectedTicket && selectedTicket.id === ticketId) {
       setSelectedTicket({ ...selectedTicket, status: newStatus });
     }
@@ -92,7 +91,7 @@ export default function BreakdownTicketsPage() {
     assignedEngineer?: string
   ) => {
     const mgrName = user?.full_name || user?.email?.split('@')[0] || 'Plant Manager';
-    await updateManagerApproval(ticketId, approvalStatus, mgrName, notes, assignedEngineer);
+    await updateManagerApproval(ticketId, approvalStatus, notes || `Manager Review by ${mgrName}`, assignedEngineer);
     if (selectedTicket && selectedTicket.id === ticketId) {
       setSelectedTicket({
         ...selectedTicket,

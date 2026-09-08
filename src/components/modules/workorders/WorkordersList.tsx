@@ -6,6 +6,7 @@ import { getWorkOrders } from '@/lib/services/workorderService';
 import { CreateWorkorderModal } from './CreateWorkorderModal';
 import { WorkorderDetailsDrawer } from './WorkorderDetailsDrawer';
 import { WorkorderCalendarView } from './WorkorderCalendarView';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import {
   Search,
   Plus,
@@ -287,7 +288,7 @@ export function WorkordersList() {
 
                       <td className="p-4">
                         <div className="flex items-center gap-1.5">
-                          {getStatusBadge(wo.status)}
+                          <StatusBadge status={wo.status} module="workorder" />
                           {isOverdue && (
                             <span className="text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 px-1 py-0.5 rounded-xs flex items-center gap-0.5">
                               <AlertTriangle className="h-3 w-3" /> OVERDUE

@@ -8,7 +8,9 @@ import { PublishTicketSolutionModal } from './PublishTicketSolutionModal';
 import { CreateWorkorderModal } from '../workorders/CreateWorkorderModal';
 import { useAuth } from '@/context/AuthContext';
 import { addTicketComment } from '@/lib/services/breakdownTicketService';
-import { X, MapPin, Clock, CheckCircle2, XCircle, Paperclip, UserCheck, MessageSquare, Send, ArrowRight, User, Sparkles, BookOpen, Lock, Calendar } from 'lucide-react';
+import { Drawer } from '@/components/ui/Drawer';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { MapPin, Clock, CheckCircle2, XCircle, Paperclip, UserCheck, MessageSquare, Send, ArrowRight, User, Sparkles, BookOpen, Lock, Calendar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface TicketDetailsDrawerProps {
@@ -83,33 +85,29 @@ export function TicketDetailsDrawer({
   // Only display general user comments in the comments box (stage changes go exclusively into Audit History)
   const generalComments = (ticket.comments || []).filter((c) => c.comment_type === 'general');
 
+  const badgeElement = (
+    <div className="flex items-center gap-2">
+      <span className="inline-block font-mono text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-500/30">
+        {ticket.ticket_number}
+      </span>
+      <StatusBadge status={ticket.status} module="ticket" />
+      {ticket.manager_approval_status && (
+        <StatusBadge status={ticket.manager_approval_status} module="approval" />
+      )}
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/30 backdrop-blur-xs">
-      <div className="absolute inset-0" onClick={onClose} />
-
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-xl bg-white border-l border-slate-200 shadow-2xl p-6 overflow-y-auto space-y-6 animate-in slide-in-from-right duration-200">
-          {/* Top Bar Header */}
-          <div className="flex items-start justify-between border-b border-slate-100 pb-4">
-            <div className="space-y-1">
-              <span className="inline-block font-mono text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-500/30">
-                {ticket.ticket_number}
-              </span>
-              <h2 className="text-base font-bold text-slate-900 leading-snug">{ticket.asset_name}</h2>
-              <p className="text-xs text-slate-500 flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5 text-slate-400" />
-                {ticket.asset_location} • Reported by <span className="font-semibold text-slate-700">{ticket.reported_by_name}</span>
-              </p>
-            </div>
-
-            <button
-              onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-stone-50 transition-all flex-shrink-0"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-
+    <>
+      <Drawer
+        isOpen={Boolean(ticket)}
+        onClose={onClose}
+        title={ticket.asset_name || 'Breakdown Ticket Details'}
+        subtitle={`${ticket.asset_location || 'Shop Floor'} • Reported by ${ticket.reported_by_name}`}
+        badge={badgeElement}
+        maxWidth="xl"
+      >
+        <div className="space-y-6">
           {/* 7-Stage Status Pipeline Visual Tracker */}
           <StatusProgressBar currentStatus={ticket.status} />
 
@@ -330,7 +328,7 @@ export function TicketDetailsDrawer({
             )}
           </div>
 
-          {/* Timestamp & Step Audit History (Placed at the VERY END of the drawer) */}
+          {/* Timestamp & Step Audit History */}
           {ticket.history && ticket.history.length > 0 && (
             <div className="space-y-3 text-xs pt-4 border-t border-slate-200">
               <h3 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
@@ -370,7 +368,7 @@ export function TicketDetailsDrawer({
             </div>
           )}
         </div>
-      </div>
+      </Drawer>
 
       {/* Advance Stage Modal */}
       <StatusStepModal
@@ -398,6 +396,6 @@ export function TicketDetailsDrawer({
           onClose();
         }}
       />
-    </div>
+    </>
   );
 }
