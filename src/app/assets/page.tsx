@@ -9,6 +9,7 @@ import { AssetListTable } from '@/components/modules/assets/AssetListTable';
 import { AssetModalForm } from '@/components/modules/assets/AssetModalForm';
 import { AssetDetailsDrawer } from '@/components/modules/assets/AssetDetailsDrawer';
 import { QRCodeModal } from '@/components/modules/assets/QRCodeModal';
+import AssetDossierModal from '@/components/modules/assets/AssetDossierModal';
 import { Plus, Cpu, CheckCircle2, AlertTriangle, ShieldAlert, RefreshCw, AlertCircle } from 'lucide-react';
 
 export default function AssetsPage() {
@@ -18,6 +19,7 @@ export default function AssetsPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [qrAsset, setQrAsset] = useState<Asset | null>(null);
+  const [dossierAssetId, setDossierAssetId] = useState<string | null>(null);
 
   const [filters, setFilters] = useState<AssetFiltersState>({
     search: '',
@@ -173,6 +175,7 @@ export default function AssetsPage() {
             assets={assets}
             onSelectAsset={(asset) => setSelectedAsset(asset)}
             onOpenQRCode={(asset) => setQrAsset(asset)}
+            onOpenDossier={(asset) => setDossierAssetId(asset.id)}
           />
         </div>
       </main>
@@ -195,6 +198,13 @@ export default function AssetsPage() {
       <QRCodeModal
         asset={qrAsset}
         onClose={() => setQrAsset(null)}
+      />
+
+      {/* Digital Twin Machine Dossier Modal (Module 6) */}
+      <AssetDossierModal
+        isOpen={Boolean(dossierAssetId)}
+        assetId={dossierAssetId}
+        onClose={() => setDossierAssetId(null)}
       />
     </div>
   );

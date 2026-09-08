@@ -8,9 +8,10 @@ interface AssetListTableProps {
   assets: Asset[];
   onSelectAsset: (asset: Asset) => void;
   onOpenQRCode: (asset: Asset) => void;
+  onOpenDossier?: (asset: Asset) => void;
 }
 
-export function AssetListTable({ assets, onSelectAsset, onOpenQRCode }: AssetListTableProps) {
+export function AssetListTable({ assets, onSelectAsset, onOpenQRCode, onOpenDossier }: AssetListTableProps) {
   const getStatusBadge = (status: AssetStatus) => {
     switch (status) {
       case 'operational':
@@ -144,6 +145,16 @@ export function AssetListTable({ assets, onSelectAsset, onOpenQRCode }: AssetLis
                 {/* QR Code & Action Drawer Button */}
                 <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-1.5">
+                    {onOpenDossier && (
+                      <button
+                        onClick={() => onOpenDossier(asset)}
+                        title="Open Machine Dossier & Vault (Module 6)"
+                        className="flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] font-bold text-amber-700 hover:bg-amber-500/20 transition-all"
+                      >
+                        <span>Dossier</span>
+                      </button>
+                    )}
+
                     <button
                       onClick={() => onOpenQRCode(asset)}
                       title="View Asset QR Code Tag"
