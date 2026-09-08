@@ -29,8 +29,11 @@ import {
 import { fetchAssets } from '@/lib/services/assetService';
 import { getWorkProcedures } from '@/lib/services/workProcedureService';
 
+import PMDetailsModal from '@/components/modules/preventive-maintenance/PMDetailsModal';
+
 export default function PreventiveMaintenancePage() {
   const [schedules, setSchedules] = useState<PMSchedule[]>([]);
+  const [selectedPmSchedule, setSelectedPmSchedule] = useState<PMSchedule | null>(null);
   const [events, setEvents] = useState<PMCalendarEvent[]>([]);
   const [assets, setAssets] = useState<{ id: string; name: string }[]>([]);
   const [procedures, setProcedures] = useState<{ id: string; title: string; procedure_number: string }[]>([]);
@@ -265,13 +268,17 @@ export default function PreventiveMaintenancePage() {
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs">
                   {schedules.map((sch) => (
-                    <tr key={sch.id} className="hover:bg-amber-500/5 transition-colors">
+                    <tr
+                      key={sch.id}
+                      onClick={() => setSelectedPmSchedule(sch)}
+                      className="hover:bg-amber-500/5 transition-colors cursor-pointer group"
+                    >
                       <td className="py-3.5 px-4">
                         <div className="space-y-0.5">
                           <span className="font-mono text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
                             {sch.schedule_number || `PM-${sch.id.slice(0, 6)}`}
                           </span>
-                          <p className="font-bold text-slate-900">{sch.title}</p>
+                          <p className="font-bold text-slate-900 group-hover:text-amber-800 transition-colors">{sch.title}</p>
                         </div>
                       </td>
 
@@ -338,6 +345,13 @@ export default function PreventiveMaintenancePage() {
         assets={assets}
         procedures={procedures}
         technicians={technicians}
+      />
+
+      {/* Modal for Viewing PM Schedule Details */}
+      <PMDetailsModal
+        isOpen={Boolean(selectedPmSchedule)}
+        schedule={selectedPmSchedule}
+        onClose={() => setSelectedPmSchedule(null)}
       />
     </div>
   );

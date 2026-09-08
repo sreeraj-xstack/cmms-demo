@@ -20,6 +20,9 @@ import {
 } from 'lucide-react';
 import { AssetDossierData, DocumentCategory, UploadAssetDocumentInput } from '@/types/assetDocument';
 import { fetchMachineDossier, uploadAssetDocument, deleteAssetDocument } from '@/lib/services/assetDocumentService';
+import { fetchSparePartsForAsset } from '@/lib/services/sparePartService';
+import { SparePart } from '@/types/sparePart';
+import { Package, MapPin } from 'lucide-react';
 
 interface AssetDossierModalProps {
   isOpen: boolean;
@@ -28,8 +31,9 @@ interface AssetDossierModalProps {
 }
 
 export default function AssetDossierModal({ isOpen, onClose, assetId }: AssetDossierModalProps) {
-  const [activeTab, setActiveTab] = useState<'specs' | 'documents' | 'history' | 'pm'>('specs');
+  const [activeTab, setActiveTab] = useState<'specs' | 'documents' | 'history' | 'spares'>('specs');
   const [dossier, setDossier] = useState<AssetDossierData | null>(null);
+  const [spareParts, setSpareParts] = useState<SparePart[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
@@ -53,6 +57,10 @@ export default function AssetDossierModal({ isOpen, onClose, assetId }: AssetDos
     try {
       const data = await fetchMachineDossier(id);
       setDossier(data);
+      if (data) {
+        const parts = await fetchSparePartsForAsset(id, data.category || data.name);
+        setSpareParts(parts);
+      }
     } catch (err) {
       console.error('Error loading Machine Dossier:', err);
     } finally {
@@ -169,6 +177,17 @@ export default function AssetDossierModal({ isOpen, onClose, assetId }: AssetDos
               >
                 <History className="w-4 h-4" />
                 Failure Timeline & MTBF ({dossier.total_failures_count})
+              </button>
+              <button
+                onClick={() => setActiveTab('spares')}
+                className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 ${
+                  activeTab === 'spares'
+                    ? 'border-amber-500 text-amber-600'
+                    : 'border-transparent text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                <Package className="w-4 h-4" />
+                Compatible Spare Parts ({spareParts.length})
               </button>
             </div>
 
@@ -386,6 +405,63 @@ export default function AssetDossierModal({ isOpen, onClose, assetId }: AssetDos
                             <span className="font-bold text-slate-900 block mb-0.5">Resolution Summary:</span>
                             {item.resolution_summary}
                           </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 4: Compatible Spare Parts (Module 8 Integration) */}
+            {activeTab === 'spares' && (
+              <div className="space-y-4">
+                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Mapped BOM Spare Parts & Warehouse Storage Locations
+                </h4>
+
+                {spareParts.length === 0 ? (
+                  <div className="py-8 text-center text-xs text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                    No compatible spare parts linked directly to this machine yet.
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {spareParts.map((sp) => (
+                      <div
+                        key={sp.id}
+                        className="p-3.5 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 hover:border-amber-300 transition-colors shadow-2xs"
+                      >
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
+                              {sp.part_number}
+                            </span>
+                            <h5 className="text-xs font-bold text-slate-900">{sp.name}</h5>
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 text-[11px] text-slate-500">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3 text-amber-500" /> {sp.storage_location}
+                            </span>
+                            <span>• Lead Time: {sp.lead_time_days} days</span>
+                            <span>• Vendor: {sp.vendor_name}</span>
+                          </div>
+                        </div>
+
+                        <div className="text-right whitespace-nowrap">
+                          <span
+                            className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${
+                              sp.quantity_available <= 0
+                                ? 'bg-rose-100 text-rose-800'
+                                : sp.quantity_available <= sp.min_quantity
+                                ? 'bg-amber-100 text-amber-900'
+                                : 'bg-emerald-100 text-emerald-800'
+                            }`}
+                          >
+                            {sp.quantity_available} {sp.unit_of_measure} Available
+                          </span>
+                          <span className="block text-[10px] text-slate-400 mt-0.5">
+                            Min: {sp.min_quantity} {sp.unit_of_measure}
+                          </span>
                         </div>
                       </div>
                     ))}

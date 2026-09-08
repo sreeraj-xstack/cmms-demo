@@ -10,7 +10,9 @@ import { useAuth } from '@/context/AuthContext';
 import { addTicketComment } from '@/lib/services/breakdownTicketService';
 import { Drawer } from '@/components/ui/Drawer';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { MapPin, Clock, CheckCircle2, XCircle, Paperclip, UserCheck, MessageSquare, Send, ArrowRight, User, Sparkles, BookOpen, Lock, Calendar } from 'lucide-react';
+import FiveWhyRCAModal from '../troubleshooting/FiveWhyRCAModal';
+import AIFixMatcherModal from '../troubleshooting/AIFixMatcherModal';
+import { HelpCircle, Bot, MapPin, Clock, CheckCircle2, XCircle, Paperclip, UserCheck, MessageSquare, Send, ArrowRight, User, Sparkles, BookOpen, Lock, Calendar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface TicketDetailsDrawerProps {
@@ -35,6 +37,8 @@ export function TicketDetailsDrawer({
   const [isStepModalOpen, setIsStepModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isCreateWoModalOpen, setIsCreateWoModalOpen] = useState(false);
+  const [isRcaModalOpen, setIsRcaModalOpen] = useState(false);
+  const [isAiFixMatcherOpen, setIsAiFixMatcherOpen] = useState(false);
 
   if (!ticket) return null;
 
@@ -140,24 +144,21 @@ export function TicketDetailsDrawer({
                 Find AI Solution
               </button>
 
-              {isFixedOrClosed ? (
-                <button
-                  onClick={() => setIsPublishModalOpen(true)}
-                  className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 text-xs shadow-xs transition-all"
-                >
-                  <BookOpen className="h-3.5 w-3.5 text-slate-950" />
-                  Publish to Library
-                </button>
-              ) : (
-                <button
-                  disabled
-                  title="Ticket must be Fixed or Closed to publish verified solution"
-                  className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-stone-100 border border-slate-200 text-slate-400 font-semibold py-2 text-xs cursor-not-allowed opacity-60"
-                >
-                  <Lock className="h-3.5 w-3.5 text-slate-400" />
-                  Publish to Library
-                </button>
-              )}
+              <button
+                onClick={() => setIsAiFixMatcherOpen(true)}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold py-2 text-xs transition-all"
+              >
+                <Bot className="h-3.5 w-3.5 text-amber-600" />
+                AI Fix Matcher
+              </button>
+
+              <button
+                onClick={() => setIsRcaModalOpen(true)}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2 text-xs shadow-xs transition-all"
+              >
+                <HelpCircle className="h-3.5 w-3.5 text-slate-950" />
+                5-Why RCA
+              </button>
             </div>
           </div>
 
@@ -394,6 +395,35 @@ export function TicketDetailsDrawer({
         onWorkorderCreated={async () => {
           setIsCreateWoModalOpen(false);
           onClose();
+        }}
+      />
+
+      {/* 5-Why Root Cause Analysis Modal */}
+      <FiveWhyRCAModal
+        isOpen={isRcaModalOpen}
+        onClose={() => setIsRcaModalOpen(false)}
+        onSuccess={() => {
+          setIsRcaModalOpen(false);
+          onClose();
+        }}
+        ticketId={ticket.id}
+        assetId={ticket.asset_id}
+        initialProblemStatement={ticket.issue_type || ticket.description}
+        assets={[{ id: ticket.asset_id, name: ticket.asset_name || 'Asset' }]}
+        procedures={[]}
+      />
+
+      {/* AI Diagnostic Fix Matcher Modal */}
+      <AIFixMatcherModal
+        isOpen={isAiFixMatcherOpen}
+        onClose={() => setIsAiFixMatcherOpen(false)}
+        ticketId={ticket.id}
+        problemStatement={ticket.issue_type || ticket.description}
+        assetId={ticket.asset_id}
+        assetName={ticket.asset_name}
+        onApplyFix={(fix) => {
+          setIsAiFixMatcherOpen(false);
+          setIsRcaModalOpen(true);
         }}
       />
     </>

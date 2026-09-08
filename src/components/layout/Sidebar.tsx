@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types/auth';
-import { Shield, LogOut, LayoutDashboard, ShieldCheck, Cpu, Wrench, Bell, BookOpen, ClipboardList, FileCheck, Calendar } from 'lucide-react';
+import { Shield, LogOut, LayoutDashboard, ShieldCheck, Cpu, Wrench, Bell, BookOpen, ClipboardList, FileCheck, Calendar, HelpCircle, Package } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getUnreadCount } from '@/lib/services/notificationService';
@@ -43,7 +43,9 @@ export function Sidebar() {
     { label: 'Work Orders', href: '/workorders', icon: ClipboardList },
     { label: 'Work Procedures', href: '/work-procedures', icon: FileCheck },
     { label: 'Preventive Maintenance', href: '/preventive-maintenance', icon: Calendar },
+    { label: 'Spare Part Inventory', href: '/inventory', icon: Package },
     { label: 'Solution Library', href: '/solution-library', icon: BookOpen },
+    { label: 'Troubleshooting & RCA', href: '/troubleshooting', icon: HelpCircle },
     { label: 'Notifications', href: '/notifications', icon: Bell, badge: unreadNotifications },
     { label: 'RBAC Permissions', href: '/rbac-permissions', icon: ShieldCheck },
   ];
