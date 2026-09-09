@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { WorkShift, AssignedTechnician } from '@/types/workorder';
 import { WorkProcedure } from '@/types/workProcedure';
+import { fetchMaintenanceUsers } from '@/lib/services/maintenanceUserService';
 
 export interface AIPlanRecommendation {
   suggestedStartTime: string;
@@ -11,14 +12,6 @@ export interface AIPlanRecommendation {
   conflictWarning?: string;
   reasoning: string[];
 }
-
-// Available factory technicians pool
-const TECHNICIAN_POOL: (AssignedTechnician & { expertise: string[] })[] = [
-  { id: 'tech-1', name: 'Vikram Singh', role: 'Senior Maintenance Engineer', expertise: ['CNC Processing Center', 'Spindle', 'Servo'] },
-  { id: 'tech-2', name: 'Rajesh Kumar', role: 'Mechanical Technician', expertise: ['Edgebander', 'Glue Pot', 'Heater'] },
-  { id: 'tech-3', name: 'Amit Sharma', role: 'Pneumatics & Hydraulics Specialist', expertise: ['Panel Saw', 'Vacuum', 'Pneumatic'] },
-  { id: 'tech-4', name: 'Suresh Patel', role: 'Electrical Specialist', expertise: ['PLC', 'Sensors', 'Boring Machine'] },
-];
 
 export async function generateAIPlanRecommendation(
   assetId: string,
@@ -81,21 +74,21 @@ export async function generateAIPlanRecommendation(
 
   reasoning.push(`Selected ${shift.toUpperCase()} production shift window (${proposedStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}).`);
 
-  // 3. Match Technicians by expertise
-  const matchedTechs = TECHNICIAN_POOL.filter((t) =>
-    t.expertise.some((exp) => machineCategory.toLowerCase().includes(exp.toLowerCase()))
-  );
-
-  const finalTechs = matchedTechs.length > 0 ? matchedTechs : [TECHNICIAN_POOL[0]];
-  const recommendedTechs: AssignedTechnician[] = finalTechs.slice(0, 2).map((t) => ({
-    id: t.id,
-    name: t.name,
-    role: t.role,
+  // 3. Recommend technicians from database records rather than a static pool.
+  const maintenanceUsers = await fetchMaintenanceUsers(['engineer']);
+  const recommendedTechs: AssignedTechnician[] = maintenanceUsers.slice(0, 2).map((user) => ({
+    id: user.id,
+    name: user.full_name,
+    role: user.department || 'Maintenance Engineer',
   }));
 
-  reasoning.push(
-    `Recommended lead technician ${recommendedTechs[0].name} (${recommendedTechs[0].role}) based on category match: "${machineCategory}".`
-  );
+  if (recommendedTechs.length > 0) {
+    reasoning.push(
+      `Recommended ${recommendedTechs.length} available maintenance engineer(s) from the database for "${machineCategory}".`
+    );
+  } else {
+    reasoning.push('No maintenance engineers are available in the database for automatic assignment.');
+  }
 
   return {
     suggestedStartTime: proposedStart.toISOString().slice(0, 16), // YYYY-MM-THH:mm format for datetime-local input

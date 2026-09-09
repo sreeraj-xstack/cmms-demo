@@ -107,16 +107,16 @@ export async function fetchMachineDossier(assetId: string): Promise<AssetDossier
 
     // 3. Fetch Machine Failure History from Tickets & Work Orders
     const { data: tickets } = await supabase
-      .from('tickets')
+      .from('breakdown_tickets')
       .select(`
         id,
         ticket_number,
-        title,
+        issue_type,
         description,
         created_at,
         status,
-        priority,
-        assigned_technician_name,
+        urgency_level,
+        assigned_engineer_name,
         resolution_summary
       `)
       .eq('asset_id', assetId)
@@ -131,15 +131,15 @@ export async function fetchMachineDossier(assetId: string): Promise<AssetDossier
       return {
         id: t.id,
         ticket_number: t.ticket_number || `TCK-${t.id.slice(0, 5)}`,
-        title: t.title,
+        title: t.issue_type,
         description: t.description || '',
         created_at: t.created_at,
         completed_at: null,
         downtime_hours: downtime,
-        severity: t.priority === 'critical' || t.priority === 'urgent' ? 'critical' : 'medium',
+        severity: t.urgency_level === 'critical' || t.urgency_level === 'high' ? 'critical' : 'medium',
         status: t.status,
-        technician_name: t.assigned_technician_name || 'Unassigned',
-        resolution_summary: t.resolution_summary || 'Pending investigation',
+        technician_name: t.assigned_engineer_name || 'Unassigned',
+        resolution_summary: t.resolution_summary || (t.status === 'fixed' || t.status === 'closed' ? 'Breakdown resolved' : 'Pending investigation'),
         cost: 0,
       };
     });

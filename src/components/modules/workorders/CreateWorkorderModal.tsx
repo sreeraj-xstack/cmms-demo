@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { CreateWorkOrderInput, WorkOrderType, WorkOrderPriority, WorkShift, AssignedTechnician, SparePartItem, ToolItem } from '@/types/workorder';
 import { Asset } from '@/types/asset';
 import { BreakdownTicket } from '@/types/breakdownTicket';
@@ -10,6 +11,11 @@ import { fetchBreakdownTickets } from '@/lib/services/breakdownTicketService';
 import { getWorkProcedures } from '@/lib/services/workProcedureService';
 import { createWorkOrder } from '@/lib/services/workorderService';
 import { generateAIPlanRecommendation } from '@/lib/services/aiPlannerService';
+import { fetchMaintenanceUsers } from '@/lib/services/maintenanceUserService';
+import { fetchSpareParts } from '@/lib/services/sparePartService';
+import { fetchTools } from '@/lib/services/toolService';
+import { SparePart } from '@/types/sparePart';
+import { Tool } from '@/types/tool';
 import { Modal } from '@/components/ui/Modal';
 import { Sparkles, Clock, Calendar, Wrench, UserCheck } from 'lucide-react';
 
@@ -26,9 +32,12 @@ export function CreateWorkorderModal({
   onWorkorderCreated,
   initialTicket,
 }: CreateWorkorderModalProps) {
+  const { user } = useAuth();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [tickets, setTickets] = useState<BreakdownTicket[]>([]);
   const [procedures, setProcedures] = useState<WorkProcedure[]>([]);
+  const [availableParts, setAvailableParts] = useState<SparePart[]>([]);
+  const [availableTools, setAvailableTools] = useState<Tool[]>([]);
 
   const [title, setTitle] = useState('');
   const [selectedAssetId, setSelectedAssetId] = useState('');
@@ -45,9 +54,7 @@ export function CreateWorkorderModal({
   const [scheduledEnd, setScheduledEnd] = useState(laterStr);
   const [targetDuration, setTargetDuration] = useState(60);
 
-  const [assignedTechs, setAssignedTechs] = useState<AssignedTechnician[]>([
-    { id: 'tech-1', name: 'Vikram Singh', role: 'Senior Maintenance Engineer' },
-  ]);
+  const [assignedTechs, setAssignedTechs] = useState<AssignedTechnician[]>([]);
 
   const [spareParts, setSpareParts] = useState<SparePartItem[]>([]);
   const [tools, setTools] = useState<ToolItem[]>([]);
@@ -79,14 +86,26 @@ export function CreateWorkorderModal({
   }, [initialTicket]);
 
   const loadDropdownData = async () => {
-    const [assetList, ticketList, procList] = await Promise.all([
+    const [assetList, ticketList, procList, maintenanceUsers, sparePartList, toolList] = await Promise.all([
       fetchAssets(),
       fetchBreakdownTickets(),
       getWorkProcedures(),
+      fetchMaintenanceUsers(['engineer']),
+      fetchSpareParts(),
+      fetchTools(),
     ]);
     setAssets(assetList);
     setTickets(ticketList.filter((t) => t.status !== 'closed' && t.status !== 'rejected'));
     setProcedures(procList);
+    setAvailableParts(sparePartList);
+    setAvailableTools(toolList);
+    setAssignedTechs(
+      maintenanceUsers.slice(0, 1).map((user) => ({
+        id: user.id,
+        name: user.full_name,
+        role: user.department || 'Maintenance Engineer',
+      }))
+    );
 
     if (assetList.length > 0 && !selectedAssetId) {
       setSelectedAssetId(assetList[0].id);
@@ -148,24 +167,30 @@ export function CreateWorkorderModal({
   };
 
   const handleAddSparePart = () => {
+    const selectedPart = availableParts.find((part) => !spareParts.some((item) => item.id === part.id));
+    if (!selectedPart) return;
+
     setSpareParts([
       ...spareParts,
       {
-        id: `part-${Date.now()}`,
-        part_name: 'Z-Axis Servo Encoder Relay 24V',
-        part_number: 'SP-HOM-901',
+        id: selectedPart.id,
+        part_name: selectedPart.name,
+        part_number: selectedPart.part_number,
         quantity: 1,
-        unit_cost: 150,
+        unit_cost: selectedPart.unit_cost,
       },
     ]);
   };
 
   const handleAddTool = () => {
+    const selectedTool = availableTools.find((tool) => !tools.some((item) => item.id === tool.id));
+    if (!selectedTool) return;
+
     setTools([
       ...tools,
       {
-        id: `tool-${Date.now()}`,
-        tool_name: 'Digital Multimeter & Torque Wrench',
+        id: selectedTool.id,
+        tool_name: selectedTool.name,
         quantity: 1,
         status: 'assigned',
       },
@@ -192,7 +217,7 @@ export function CreateWorkorderModal({
         assigned_technicians: assignedTechs,
         tools_required: tools,
         spare_parts_required: spareParts,
-        created_by_name: 'Plant Maintenance Manager',
+        created_by_name: user?.full_name || user?.email?.split('@')[0] || 'Maintenance User',
       };
 
       await createWorkOrder(input);
@@ -217,7 +242,7 @@ export function CreateWorkorderModal({
     >
       <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
         {/* AI Assisted Planning Bar */}
-        <div className="p-4 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 rounded-2xl space-y-3">
+        <div className="p-4 bg-linear-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 rounded-2xl space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-amber-600 animate-pulse" />
@@ -432,6 +457,7 @@ export function CreateWorkorderModal({
                 <button
                   type="button"
                   onClick={handleAddSparePart}
+                  disabled={availableParts.length === spareParts.length}
                   className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-semibold hover:bg-amber-100"
                 >
                   + Part
@@ -439,7 +465,8 @@ export function CreateWorkorderModal({
                 <button
                   type="button"
                   onClick={handleAddTool}
-                  className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-semibold hover:bg-amber-100"
+                  disabled={availableTools.length === tools.length}
+                  className="text-[11px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md font-semibold hover:bg-amber-100 disabled:opacity-50"
                 >
                   + Tool
                 </button>

@@ -133,11 +133,22 @@ export async function publishSolutionFromTicket(
   userName: string,
   userRole: string
 ): Promise<SolutionItem | null> {
+  const supabase = createClient();
+  const { data: asset, error: assetError } = await supabase
+    .from('assets')
+    .select('machine_type')
+    .eq('id', ticket.asset_id)
+    .single();
+
+  if (assetError || !asset) {
+    throw new Error('Unable to resolve the ticket asset before publishing the solution.');
+  }
+
   const assetTag = ticket.asset_tag || 'AST-N/A';
   return createSolution(
     {
       title: `${ticket.asset_name || 'Machine Asset'} - ${ticket.issue_type} Resolution`,
-      machine_type: 'CNC Processing Center', // Defaults or maps from ticket asset
+      machine_type: asset.machine_type,
       issue_category: ticket.issue_type,
       problem_symptoms: ticket.description,
       resolution_steps: resolutionSteps,
@@ -245,8 +256,7 @@ export async function uploadMachineManual(
     });
 
     if (error) {
-      console.warn('Fallback object URL for manual upload:', error.message);
-      publicUrl = URL.createObjectURL(file);
+      throw new Error(`Unable to upload machine manual: ${error.message}`);
     } else {
       const { data: publicUrlData } = supabase.storage.from('machine-manuals').getPublicUrl(data.path);
       publicUrl = publicUrlData.publicUrl;
@@ -296,14 +306,12 @@ export async function uploadSolutionMediaFile(file: File): Promise<string> {
     });
 
     if (error) {
-      console.warn('Fallback object URL for solution media:', error.message);
-      return URL.createObjectURL(file);
+      throw new Error(`Unable to upload solution media: ${error.message}`);
     }
 
     const { data: publicUrlData } = supabase.storage.from('solution-attachments').getPublicUrl(data.path);
     return publicUrlData.publicUrl;
   } catch (err) {
-    console.warn('Storage exception for solution media, fallback to Object URL:', err);
-    return URL.createObjectURL(file);
+    throw err;
   }
 }

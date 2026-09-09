@@ -64,6 +64,7 @@ export interface BreakdownTicket {
   assigned_engineer_name?: string;
   manager_approval_status: ManagerApprovalStatus;
   manager_notes?: string;
+  resolution_summary?: string | null;
   work_order_id?: string;
   created_at: string;
   updated_at: string;

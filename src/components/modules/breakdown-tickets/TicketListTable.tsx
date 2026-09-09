@@ -97,7 +97,7 @@ export function TicketListTable({ tickets, onSelectTicket }: TicketListTableProp
         <AlertTriangle className="h-8 w-8 text-slate-300 mx-auto" />
         <h3 className="text-sm font-bold text-slate-900">No Breakdown Tickets Found</h3>
         <p className="text-xs text-slate-500 max-w-sm mx-auto">
-          No breakdown tickets match your current filters. Click "Raise Breakdown Ticket" to report a machine issue.
+          No breakdown tickets match your current filters. Click &quot;Raise Breakdown Ticket&quot; to report a machine issue.
         </p>
       </div>
     );

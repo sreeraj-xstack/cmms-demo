@@ -7,6 +7,22 @@ import {
   WorkOrderTimeLog,
 } from '@/types/workorder';
 
+export async function uploadWorkOrderProof(file: File): Promise<string> {
+  const supabase = createClient();
+  const extension = file.name.split('.').pop() || 'bin';
+  const path = `closure-proof/${Date.now()}_${crypto.randomUUID()}.${extension}`;
+
+  const { data, error } = await supabase.storage
+    .from('workorder-attachments')
+    .upload(path, file, { cacheControl: '3600', upsert: false });
+
+  if (error || !data) {
+    throw new Error(error?.message || 'Unable to upload work-order proof.');
+  }
+
+  return supabase.storage.from('workorder-attachments').getPublicUrl(data.path).data.publicUrl;
+}
+
 export async function getWorkOrders(filters?: Partial<WorkOrderFiltersState>): Promise<WorkOrder[]> {
   const supabase = createClient();
   let query = supabase
@@ -163,6 +179,9 @@ export async function updateWorkOrderStatus(
 ): Promise<WorkOrder> {
   const supabase = createClient();
 
+  const currentWo = await getWorkOrderById(workOrderId);
+  if (!currentWo) throw new Error('Workorder not found');
+
   if (newStatus === 'closed') {
     const { data, error } = await supabase.rpc('rpc_close_work_order', {
       p_work_order_id: workOrderId,
@@ -177,8 +196,17 @@ export async function updateWorkOrderStatus(
       throw new Error(error.message || 'Failed to close workorder');
     }
   } else {
-    const currentWo = await getWorkOrderById(workOrderId);
-    if (!currentWo) throw new Error('Workorder not found');
+    const allowedTransitions: Record<WorkOrderStatus, WorkOrderStatus[]> = {
+      troubleshooting: ['repairing', 'waiting_on_sparepart', 'on_hold'],
+      repairing: ['waiting_on_sparepart', 'on_hold'],
+      waiting_on_sparepart: ['troubleshooting', 'repairing', 'on_hold'],
+      on_hold: ['troubleshooting', 'repairing'],
+      closed: [],
+    };
+
+    if (!allowedTransitions[currentWo.status].includes(newStatus)) {
+      throw new Error(`Invalid work-order transition from ${currentWo.status} to ${newStatus}.`);
+    }
 
     const { error } = await supabase
       .from('work_orders')

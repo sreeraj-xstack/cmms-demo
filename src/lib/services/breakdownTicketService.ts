@@ -232,8 +232,7 @@ export async function uploadAttachmentFile(file: File): Promise<string> {
     });
 
   if (error) {
-    console.warn('Storage upload warning, fallback to object URL:', error.message);
-    return URL.createObjectURL(file);
+    throw new Error(`Unable to upload breakdown attachment: ${error.message}`);
   }
 
   const { data: publicUrlData } = supabase.storage

@@ -63,6 +63,19 @@ export async function queryAISolutions(
     }
 
     const solutionsList = (dbSolutions || []) as SolutionItem[];
+    const manualQuery = supabase
+      .from('machine_manuals')
+      .select('id, manual_number, title, machine_type, file_url, file_name, extracted_text, uploaded_by_name, created_at')
+      .or(`title.ilike.%${problemQuery}%,extracted_text.ilike.%${problemQuery}%`);
+
+    if (targetMachineType && targetMachineType !== 'all') {
+      manualQuery.eq('machine_type', targetMachineType);
+    }
+
+    const { data: manuals, error: manualsError } = await manualQuery;
+    if (manualsError) {
+      console.error('Error searching machine manuals:', manualsError.message);
+    }
 
     // 2. Score & Rank results with diagnostic justifications
     const results: AISearchResult[] = [];
@@ -146,6 +159,30 @@ export async function queryAISolutions(
           original_item: sol,
         });
       }
+    }
+
+    for (const manual of (manuals || []) as MachineManual[]) {
+      const excerpt = manual.extracted_text || manual.title;
+      results.push({
+        id: manual.id,
+        title: manual.title,
+        source_type: 'manual',
+        confidence_score: targetMachineType && manual.machine_type === targetMachineType ? 55 : 35,
+        machine_type: manual.machine_type,
+        issue_category: 'Machine Manual',
+        symptoms_or_excerpt: excerpt.slice(0, 280),
+        resolution_steps: `Review the relevant section of ${manual.file_name}.`,
+        tags: [manual.machine_type, 'machine-manual'],
+        matched_error_codes: errorCodesInQuery.filter((code) => excerpt.toLowerCase().includes(code.toLowerCase())),
+        matched_components: componentsInQuery.filter((component) => excerpt.toLowerCase().includes(component.toLowerCase())),
+        score_breakdown: {
+          errorCodeScore: 0,
+          componentScore: 0,
+          machineTypeScore: targetMachineType && manual.machine_type === targetMachineType ? 15 : 0,
+          verificationBoost: 0,
+        },
+        original_item: manual,
+      });
     }
 
     // Sort by confidence score descending

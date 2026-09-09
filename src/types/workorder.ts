@@ -31,9 +31,11 @@ export interface ToolItem {
 export interface WorkOrderPart {
   id: string;
   work_order_id: string;
+  spare_part_id?: string | null;
   part_name: string;
   part_number: string;
   quantity: number;
+  issued_quantity: number;
   unit_cost: number;
   created_at: string;
 }

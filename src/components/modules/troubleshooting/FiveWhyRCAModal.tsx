@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { Modal } from '@/components/ui/Modal';
 import {
   HelpCircle,
@@ -39,6 +40,7 @@ export default function FiveWhyRCAModal({
   assets,
   procedures,
 }: FiveWhyRCAModalProps) {
+  const { user } = useAuth();
   const [selectedAssetId, setSelectedAssetId] = useState(defaultAssetId || '');
   const [problemStatement, setProblemStatement] = useState(initialProblemStatement);
   const [why1, setWhy1] = useState('');
@@ -86,7 +88,7 @@ export default function FiveWhyRCAModal({
         preventive_action: preventiveAction || undefined,
         linked_procedure_id: linkedProcedureId || undefined,
         publish_to_solution_library: publishToLibrary,
-        created_by_name: 'Lead Maintenance Engineer',
+        created_by_name: user?.full_name || user?.email?.split('@')[0] || 'Maintenance Engineer',
       };
 
       await createTroubleshootingRCA(payload);
@@ -145,7 +147,7 @@ export default function FiveWhyRCAModal({
               value={category}
               onChange={(e) => setCategory(e.target.value as RootCauseCategory)}
               required
-              className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold text-amber-900 uppercase focus:outline-none focus:border-amber-500"
+              className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl text-amber-900 font-bold uppercase focus:outline-none focus:border-amber-500"
             >
               <option value="mechanical">Mechanical Failure</option>
               <option value="electrical">Electrical / Sensor</option>
@@ -291,7 +293,7 @@ export default function FiveWhyRCAModal({
         {/* Executable SOP Link & Solution Library Checkbox */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 bg-amber-50/50 border border-amber-200 rounded-xl">
           <div>
-            <label className="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5">
               <FileCheck className="w-3.5 h-3.5 text-emerald-600" />
               Link Module 4 SOP Fix Checklist (7.05)
             </label>

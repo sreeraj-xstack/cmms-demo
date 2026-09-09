@@ -16,17 +16,15 @@ export async function analyzeAssetFailureRisk(assetId: string): Promise<AIRiskAn
 
     // 2. Fetch completed breakdown work orders & tickets for this asset
     const { data: tickets } = await supabase
-      .from('tickets')
-      .select('id, title, created_at, status, priority, resolution_summary')
+      .from('breakdown_tickets')
+      .select('id, issue_type, created_at, status, urgency_level')
       .eq('asset_id', assetId);
-
-    const ticketCount = tickets?.length || 0;
 
     // Filter tickets in last 90 days
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-    const recentTickets = (tickets || []).filter(t => new Date(t.created_at) >= ninetyDaysAgo);
+    const recentTickets = (tickets || []).filter((ticket) => new Date(ticket.created_at) >= ninetyDaysAgo);
     const recentBreakdownCount = recentTickets.length;
 
     // 3. Compute Risk Score (0 - 100) based on breakdown frequency & asset criticality

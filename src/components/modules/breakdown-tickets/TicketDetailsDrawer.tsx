@@ -319,7 +319,7 @@ export function TicketDetailsDrawer({
                       </span>
                     </div>
                     <p className="text-xs text-slate-800 leading-relaxed bg-stone-50 p-2 rounded-xl border border-slate-100 font-medium">
-                      "{c.comment_text}"
+                      &quot;{c.comment_text}&quot;
                     </p>
                   </div>
                 ))}
@@ -359,7 +359,7 @@ export function TicketDetailsDrawer({
                       <div className="rounded-xl bg-amber-50/60 border border-amber-300/50 p-3 text-xs text-slate-900 space-y-1">
                         <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">Step Note / Comment</span>
                         <p className="leading-relaxed font-medium text-slate-800">
-                          "{h.notes}"
+                          &quot;{h.notes}&quot;
                         </p>
                       </div>
                     )}

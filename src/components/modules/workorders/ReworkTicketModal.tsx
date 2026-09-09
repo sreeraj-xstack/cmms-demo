@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { WorkOrder } from '@/types/workorder';
 import { createReworkTicket } from '@/lib/services/workorderService';
 import { Modal } from '@/components/ui/Modal';
@@ -19,6 +20,7 @@ export function ReworkTicketModal({
   onClose,
   onSuccess,
 }: ReworkTicketModalProps) {
+  const { user } = useAuth();
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +32,8 @@ export function ReworkTicketModal({
 
     setLoading(true);
     try {
-      await createReworkTicket(workOrder.id, notes, 'Plant Maintenance Manager');
+      const actorName = user?.full_name || user?.email?.split('@')[0] || 'Maintenance Manager';
+      await createReworkTicket(workOrder.id, notes, actorName);
       onSuccess();
       onClose();
     } catch (err) {

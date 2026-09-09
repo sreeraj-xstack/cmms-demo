@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { WorkOrder } from '@/types/workorder';
-import { updateWorkOrderStatus } from '@/lib/services/workorderService';
-import { publishSolutionFromTicket } from '@/lib/services/solutionLibraryService';
+import { updateWorkOrderStatus, uploadWorkOrderProof } from '@/lib/services/workorderService';
+import { useAuth } from '@/context/AuthContext';
 import { Modal } from '@/components/ui/Modal';
 import { CheckCircle2, Camera, BookOpen, AlertCircle } from 'lucide-react';
 
@@ -20,8 +20,9 @@ export function CloseWorkorderModal({
   onClose,
   onSuccess,
 }: CloseWorkorderModalProps) {
+  const { user } = useAuth();
   const [closureNotes, setClosureNotes] = useState('');
-  const [photoUrl, setPhotoUrl] = useState('');
+  const [proofFile, setProofFile] = useState<File | null>(null);
   const [publishToLibrary, setPublishToLibrary] = useState(true);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -44,24 +45,17 @@ export function CloseWorkorderModal({
     setLoading(true);
     setErrorMessage('');
     try {
-      // 1. Update Work Order status to 'closed' with closurePhotoUrl
+      const proofUrl = proofFile ? await uploadWorkOrderProof(proofFile) : undefined;
+      const actorName = user?.full_name || user?.email?.split('@')[0] || 'Maintenance Engineer';
+
       await updateWorkOrderStatus(
         workOrder.id,
         'closed',
-        'Senior Maintenance Engineer',
+        actorName,
         closureNotes || 'Work completed successfully with proof of work.',
-        photoUrl || undefined
+        proofUrl,
+        publishToLibrary
       );
-
-      // 2. If requested and breakdown ticket linked, publish to Solution Library (Module 2 integration)
-      if (publishToLibrary && workOrder.breakdown_ticket) {
-        await publishSolutionFromTicket(
-          workOrder.breakdown_ticket,
-          closureNotes || 'Work procedure completed and verified.',
-          'Senior Maintenance Engineer',
-          'engineer'
-        );
-      }
 
       onSuccess();
       onClose();
@@ -114,16 +108,16 @@ export function CloseWorkorderModal({
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-slate-700 flex items-center gap-1">
-            <Camera className="h-3.5 w-3.5 text-slate-500" /> Proof of Work Attachment URL (Photos)
+            <label className="text-xs font-semibold text-slate-700 flex items-center gap-1">
+            <Camera className="h-3.5 w-3.5 text-slate-500" /> Proof of Work Attachment (Photo)
           </label>
           <input
-            type="text"
-            value={photoUrl}
-            onChange={(e) => setPhotoUrl(e.target.value)}
-            placeholder="https://... (e.g. Photo of replaced Z-axis relay or clean glue pot)"
+            type="file"
+            accept="image/*"
+            onChange={(e) => setProofFile(e.target.files?.[0] || null)}
             className="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
           />
+          <p className="text-[11px] text-slate-500">Upload a real completion photo; the file is stored with the work order.</p>
         </div>
 
         <div className="p-3 bg-amber-50/60 border border-amber-200 rounded-xl space-y-2">

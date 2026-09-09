@@ -289,7 +289,7 @@ function SolutionLibraryContent() {
               ) : (
                 <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-500 italic space-y-2 shadow-xs">
                   <p className="text-sm font-semibold text-slate-700">No solutions matched your search filters.</p>
-                  <p className="text-xs text-slate-400">Click "Add Solution" or try using the AI Solution Matcher.</p>
+                  <p className="text-xs text-slate-400">Click &quot;Add Solution&quot; or try using the AI Solution Matcher.</p>
                 </div>
               )}
             </div>

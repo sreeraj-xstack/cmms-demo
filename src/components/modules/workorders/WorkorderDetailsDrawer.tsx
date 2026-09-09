@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { WorkOrder, WorkOrderStatus } from '@/types/workorder';
 import {
   updateWorkOrderStatus,
@@ -8,7 +9,9 @@ import {
   startWorkTimer,
   stopWorkTimer,
   getWorkOrderById,
+  uploadWorkOrderProof,
 } from '@/lib/services/workorderService';
+import { issueWorkOrderPart } from '@/lib/services/sparePartService';
 import { CloseWorkorderModal } from './CloseWorkorderModal';
 import { ReworkTicketModal } from './ReworkTicketModal';
 import { Drawer } from '@/components/ui/Drawer';
@@ -40,6 +43,7 @@ export function WorkorderDetailsDrawer({
   onClose,
   onRefresh,
 }: WorkorderDetailsDrawerProps) {
+  const { user } = useAuth();
   const [wo, setWo] = useState<WorkOrder | null>(initialWo);
   const [activeTab, setActiveTab] = useState<'overview' | 'checklist' | 'timelog' | 'parts' | 'history'>('overview');
 
@@ -47,6 +51,9 @@ export function WorkorderDetailsDrawer({
   const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
   const [isReworkModalOpen, setIsReworkModalOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [proofUploadStepId, setProofUploadStepId] = useState<string | null>(null);
+  const [issueLoadingPartId, setIssueLoadingPartId] = useState<string | null>(null);
+  const actorName = user?.full_name || user?.email?.split('@')[0] || 'Maintenance Engineer';
 
   React.useEffect(() => {
     setWo(initialWo);
@@ -71,7 +78,7 @@ export function WorkorderDetailsDrawer({
 
     setActionLoading(true);
     try {
-      await updateWorkOrderStatus(wo.id, newStatus, 'Maintenance Engineer');
+      await updateWorkOrderStatus(wo.id, newStatus, actorName);
       await reloadWo();
     } catch (err: any) {
       alert(err.message || 'Failed to update status');
@@ -82,17 +89,53 @@ export function WorkorderDetailsDrawer({
 
   const handleToggleStep = async (stepId: string, currentCompleted: boolean) => {
     try {
-      await toggleProcedureStepCompletion(stepId, !currentCompleted, 'Senior Maintenance Engineer');
+      await toggleProcedureStepCompletion(stepId, !currentCompleted, actorName);
       await reloadWo();
     } catch (err) {
       console.error(err);
     }
   };
 
+  const handleStepProofUpload = async (stepId: string, file?: File) => {
+    if (!file) return;
+
+    setProofUploadStepId(stepId);
+    try {
+      const proofUrl = await uploadWorkOrderProof(file);
+      const step = wo?.procedure_steps?.find((item) => item.id === stepId);
+      if (step) {
+        await toggleProcedureStepCompletion(
+          step.id,
+          step.is_completed,
+          step.completed_by_name || actorName,
+          proofUrl,
+          step.step_notes
+        );
+        await reloadWo();
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Unable to upload step proof.');
+    } finally {
+      setProofUploadStepId(null);
+    }
+  };
+
+  const handleIssuePart = async (partId: string, sparePartId: string, quantity: number) => {
+    setIssueLoadingPartId(partId);
+    try {
+      await issueWorkOrderPart(wo?.id || '', sparePartId, quantity, actorName);
+      await reloadWo();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Unable to issue spare part.');
+    } finally {
+      setIssueLoadingPartId(null);
+    }
+  };
+
   const handleStartTimer = async () => {
     setActionLoading(true);
     try {
-      const log = await startWorkTimer(wo.id, 'Vikram Singh (Senior Engineer)', 'repairing');
+      const log = await startWorkTimer(wo.id, actorName, 'repairing');
       setActiveTimerId(log.id);
       await reloadWo();
     } catch (err) {
@@ -356,6 +399,20 @@ export function WorkorderDetailsDrawer({
 
                             <p className="text-xs text-slate-600">{step.instructions}</p>
 
+                            {step.requires_photo_proof && (
+                              <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-purple-700 cursor-pointer">
+                                <Camera className="h-3.5 w-3.5" />
+                                {proofUploadStepId === step.id ? 'Uploading proof...' : step.proof_photo_url ? 'Replace photo proof' : 'Upload photo proof'}
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  disabled={proofUploadStepId !== null}
+                                  onChange={(event) => handleStepProofUpload(step.id, event.target.files?.[0])}
+                                />
+                              </label>
+                            )}
+
                             {step.completed_at && (
                               <p className="text-[10px] text-emerald-700 font-semibold pt-1">
                                 ✓ Completed by {step.completed_by_name || 'Engineer'} at{' '}
@@ -441,13 +498,25 @@ export function WorkorderDetailsDrawer({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                     <span className="text-xs font-bold text-slate-800">Required Spare Parts</span>
-                    {(wo.spare_parts_required || []).length === 0 ? (
+                    {(wo.parts || []).length === 0 ? (
                       <p className="text-xs text-slate-400 italic">No spare parts allocated.</p>
                     ) : (
-                      wo.spare_parts_required.map((p, idx) => (
-                        <div key={idx} className="p-2 bg-white rounded-lg border border-slate-200 text-xs flex justify-between">
-                          <span>⚙️ {p.part_name}</span>
-                          <span className="font-bold text-slate-800">x{p.quantity}</span>
+                      (wo.parts || []).map((part) => (
+                        <div key={part.id} className="p-2 bg-white rounded-lg border border-slate-200 text-xs space-y-2">
+                          <div className="flex justify-between gap-2">
+                            <span>⚙️ {part.part_name}</span>
+                            <span className="font-bold text-slate-800">{part.issued_quantity}/{part.quantity} issued</span>
+                          </div>
+                          {part.spare_part_id && part.issued_quantity < part.quantity && (
+                            <button
+                              type="button"
+                              onClick={() => handleIssuePart(part.id, part.spare_part_id || '', part.quantity - part.issued_quantity)}
+                              disabled={issueLoadingPartId === part.id}
+                              className="text-[11px] font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 disabled:opacity-50"
+                            >
+                              {issueLoadingPartId === part.id ? 'Issuing...' : `Issue remaining ${part.quantity - part.issued_quantity}`}
+                            </button>
+                          )}
                         </div>
                       ))
                     )}

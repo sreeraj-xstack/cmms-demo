@@ -28,6 +28,7 @@ import {
 } from '@/lib/services/preventiveMaintenanceService';
 import { fetchAssets } from '@/lib/services/assetService';
 import { getWorkProcedures } from '@/lib/services/workProcedureService';
+import { fetchMaintenanceUsers } from '@/lib/services/maintenanceUserService';
 
 import PMDetailsModal from '@/components/modules/preventive-maintenance/PMDetailsModal';
 
@@ -37,11 +38,7 @@ export default function PreventiveMaintenancePage() {
   const [events, setEvents] = useState<PMCalendarEvent[]>([]);
   const [assets, setAssets] = useState<{ id: string; name: string }[]>([]);
   const [procedures, setProcedures] = useState<{ id: string; title: string; procedure_number: string }[]>([]);
-  const [technicians] = useState<{ id: string; name: string }[]>([
-    { id: 'tech-1', name: 'Rajesh Kumar' },
-    { id: 'tech-2', name: 'Suresh Patel' },
-    { id: 'tech-3', name: 'Amit Verma' },
-  ]);
+  const [technicians, setTechnicians] = useState<{ id: string; name: string }[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingWOs, setIsGeneratingWOs] = useState(false);
@@ -64,17 +61,19 @@ export default function PreventiveMaintenancePage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [pmList, calEvents, assetList, procList] = await Promise.all([
+      const [pmList, calEvents, assetList, procList, maintenanceUsers] = await Promise.all([
         fetchPMSchedules(),
         fetchPMCalendarEvents(filters),
         fetchAssets(),
         getWorkProcedures(),
+        fetchMaintenanceUsers(),
       ]);
 
       setSchedules(pmList);
       setEvents(calEvents);
       setAssets(assetList.map((a) => ({ id: a.id, name: a.name })));
       setProcedures(procList.map((p) => ({ id: p.id, title: p.title, procedure_number: p.procedure_number })));
+      setTechnicians(maintenanceUsers.map((user) => ({ id: user.id, name: user.full_name })));
     } catch (err) {
       console.error('Error loading PM page data:', err);
     } finally {
