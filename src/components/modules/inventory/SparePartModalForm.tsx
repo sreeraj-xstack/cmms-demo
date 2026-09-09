@@ -60,24 +60,24 @@ export default function SparePartModalForm({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full overflow-hidden border border-slate-200 animate-in fade-in zoom-in duration-200">
-        {/* Header */}
-        <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+        {/* Header (Clean Light Theme) */}
+        <div className="bg-stone-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-amber-500/20 border border-amber-500/30 rounded-lg flex items-center justify-center text-amber-400">
+            <div className="w-8 h-8 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center justify-center text-amber-600 font-bold">
               <Package className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-semibold text-white">Register New Spare Part</h3>
-              <p className="text-xs text-slate-400">
+              <h3 className="text-base font-bold text-slate-900">Register New Spare Part</h3>
+              <p className="text-xs text-slate-500">
                 Add warehouse inventory item with reorder specs & location mapping
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-white transition-all shrink-0"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 

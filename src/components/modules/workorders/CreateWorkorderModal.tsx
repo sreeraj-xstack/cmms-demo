@@ -353,7 +353,7 @@ export function CreateWorkorderModal({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700">Work Procedure / Checklist (Module 4)</label>
+            <label className="text-xs font-semibold text-slate-700">Work Procedure / SOP Checklist</label>
             <select
               value={selectedProcedureId || ''}
               onChange={(e) => setSelectedProcedureId(e.target.value || undefined)}

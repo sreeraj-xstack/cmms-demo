@@ -8,8 +8,6 @@ import {
   Clock,
   AlertTriangle,
   Layers,
-  ChevronRight,
-  SlidersHorizontal,
   PackageCheck,
   PackageX,
 } from 'lucide-react';
@@ -18,7 +16,7 @@ interface SparePartListTableProps {
   parts: SparePart[];
   isLoading: boolean;
   onSelectPart: (part: SparePart) => void;
-  onAdjustStock: (part: SparePart) => void;
+  onAdjustStock?: (part: SparePart) => void;
 }
 
 export default function SparePartListTable({
@@ -63,7 +61,6 @@ export default function SparePartListTable({
               <th className="py-3.5 px-4">Lead Time</th>
               <th className="py-3.5 px-4">Stock Level</th>
               <th className="py-3.5 px-4 text-right">Unit Cost (₹)</th>
-              <th className="py-3.5 px-4 text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-sm">
@@ -183,29 +180,6 @@ export default function SparePartListTable({
                       <span className="text-[11px] text-slate-500">
                         Total: ₹{(part.unit_cost * part.quantity_available).toLocaleString('en-IN')}
                       </span>
-                    </div>
-                  </td>
-
-                  {/* Actions */}
-                  <td className="py-3.5 px-4 text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex items-center justify-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => onAdjustStock(part)}
-                        title="Adjust Stock Quantity"
-                        className="px-2.5 py-1 text-xs font-medium text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-md transition-colors flex items-center gap-1"
-                      >
-                        <SlidersHorizontal className="w-3 h-3" /> Stock
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => onSelectPart(part)}
-                        title="Inspect Part Details"
-                        className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
                     </div>
                   </td>
                 </tr>

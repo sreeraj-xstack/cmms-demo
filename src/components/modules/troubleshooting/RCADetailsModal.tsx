@@ -153,7 +153,7 @@ export default function RCADetailsModal({ rca, isOpen, onClose, onUpvote }: RCAD
                 <FileCheck className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] text-emerald-800 font-bold uppercase block">Executable SOP Fix (Module 4)</span>
+                <span className="text-[10px] text-emerald-800 font-bold uppercase block">Executable SOP Fix</span>
                 <h5 className="text-xs font-bold text-emerald-950">{rca.linked_procedure.title}</h5>
               </div>
             </div>

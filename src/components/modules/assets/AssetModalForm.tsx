@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { CreateAssetInput, AssetStatus, AssetCriticality } from '@/types/asset';
 import { X, Plus } from 'lucide-react';
 
+import { generateQRPayload } from '@/lib/utils/qrUtils';
+
 interface AssetModalFormProps {
   isOpen: boolean;
   onClose: () => void;
@@ -36,10 +38,17 @@ export function AssetModalForm({ isOpen, onClose, onSubmit }: AssetModalFormProp
     setLoading(true);
     const finalTag = formData.asset_tag.trim() || `AST-XSTACK-${Date.now().toString().slice(-4)}`;
     
+    const qrPayload = generateQRPayload('asset', {
+      asset_tag: finalTag,
+      name: formData.name,
+      location: formData.location,
+      category: formData.machine_type,
+    });
+
     await onSubmit({
       ...formData,
       asset_tag: finalTag,
-      qr_code: `XSTACK-${finalTag}`,
+      qr_code: qrPayload,
       installation_date: formData.installation_date || '',
       warranty_expiry: formData.warranty_expiry || '',
     });

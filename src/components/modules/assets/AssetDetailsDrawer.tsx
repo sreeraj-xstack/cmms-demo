@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { Asset, AssetStatus } from '@/types/asset';
-import { X, QrCode, MapPin, Calendar, Wrench, AlertOctagon, FileText, CheckCircle2, ShieldAlert, Copy, Check } from 'lucide-react';
+import { X, QrCode, MapPin, Calendar, Wrench, AlertOctagon, FileText, CheckCircle2, ShieldAlert, Copy, Check, Download } from 'lucide-react';
+import { QRCodeSVG } from '@/components/common/QRCodeSVG';
+import { generateQRPayload, parseQRPayload } from '@/lib/utils/qrUtils';
 
 interface AssetDetailsDrawerProps {
   asset: Asset | null;
@@ -15,8 +17,19 @@ export function AssetDetailsDrawer({ asset, onClose, onStatusChange }: AssetDeta
 
   if (!asset) return null;
 
+  const parsed = parseQRPayload(asset.qr_code || '');
+  const qrPayloadString = parsed.isStructured
+    ? asset.qr_code!
+    : generateQRPayload('asset', {
+        id: asset.id,
+        asset_tag: asset.asset_tag,
+        name: asset.name,
+        location: asset.location,
+        category: asset.machine_type,
+      });
+
   const handleCopyQR = () => {
-    navigator.clipboard.writeText(asset.qr_code || asset.asset_tag);
+    navigator.clipboard.writeText(qrPayloadString);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -123,18 +136,20 @@ export function AssetDetailsDrawer({ asset, onClose, onStatusChange }: AssetDeta
                 onClick={handleCopyQR}
                 className="flex items-center gap-1 text-[11px] font-semibold text-amber-800 hover:underline"
               >
-                {copied ? <Check className="h-3.5 w-3.5 text-amber-600" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
-                {copied ? 'Copied' : 'Copy Code'}
+                {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
+                {copied ? 'Copied' : 'Copy Payload'}
               </button>
             </div>
 
             <div className="flex items-center gap-4 bg-stone-50 border border-slate-200 p-3 rounded-xl">
-              <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white border border-slate-200 font-mono font-bold text-[10px] text-slate-800 shadow-xs text-center p-1">
-                [QR TAG]
-              </div>
+              <QRCodeSVG value={qrPayloadString} size={88} className="shrink-0" />
               <div className="space-y-1 overflow-hidden">
-                <p className="text-xs font-mono font-bold text-slate-900 truncate">{asset.qr_code}</p>
-                <p className="text-[11px] text-slate-500">Scan at machine line to report breakdown or execute mobile checklists.</p>
+                <p className="text-xs font-mono font-bold text-slate-900 truncate">
+                  {asset.asset_tag}
+                </p>
+                <p className="text-[11px] text-slate-500 leading-snug">
+                  Structured QR payload containing location, plant bay, and asset specifications. Scan at machine line to log breakdown or execute PM checklists.
+                </p>
               </div>
             </div>
           </div>

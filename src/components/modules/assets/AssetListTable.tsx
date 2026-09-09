@@ -98,7 +98,6 @@ export function AssetListTable({ assets, onSelectAsset, onOpenQRCode, onOpenDoss
               <th className="py-3 px-4">Location</th>
               <th className="py-3 px-4">Criticality</th>
               <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4 text-right">QR & Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-xs">
@@ -141,38 +140,6 @@ export function AssetListTable({ assets, onSelectAsset, onOpenQRCode, onOpenDoss
 
                 {/* Status */}
                 <td className="py-3.5 px-4">{getStatusBadge(asset.status)}</td>
-
-                {/* QR Code & Action Drawer Button */}
-                <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
-                  <div className="flex items-center justify-end gap-1.5">
-                    {onOpenDossier && (
-                      <button
-                        onClick={() => onOpenDossier(asset)}
-                        title="Open Machine Dossier & Vault (Module 6)"
-                        className="flex items-center gap-1 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-[11px] font-bold text-amber-700 hover:bg-amber-500/20 transition-all"
-                      >
-                        <span>Dossier</span>
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => onOpenQRCode(asset)}
-                      title="View Asset QR Code Tag"
-                      className="flex items-center gap-1 rounded-lg border border-slate-200 bg-stone-50 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-800 transition-all"
-                    >
-                      <QrCode className="h-3.5 w-3.5 text-amber-600" />
-                      <span>QR Tag</span>
-                    </button>
-
-                    <button
-                      onClick={() => onSelectAsset(asset)}
-                      title="View Full Specifications Drawer"
-                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:border-amber-400 hover:text-amber-700 transition-all"
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </td>
               </tr>
             ))}
           </tbody>

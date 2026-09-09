@@ -120,7 +120,7 @@ export default function PMDetailsModal({ schedule, isOpen, onClose }: PMDetailsM
               <FileCheck className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">Attached SOP Checklist (Module 4)</span>
+              <span className="text-[10px] text-slate-400 font-bold uppercase block">Attached SOP Checklist</span>
               <h5 className="text-xs font-bold text-slate-900">
                 {schedule.procedure_title || 'Standard PM Inspection Protocol'}
               </h5>

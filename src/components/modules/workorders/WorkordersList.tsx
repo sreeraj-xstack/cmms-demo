@@ -104,7 +104,7 @@ export function WorkordersList() {
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">Work Orders Engine</h1>
             <span className="bg-amber-500/10 text-amber-900 border border-amber-500/30 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-              Module 3 Production Grade
+              Production Grade Work Orders
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">

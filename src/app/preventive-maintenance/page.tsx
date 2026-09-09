@@ -201,7 +201,7 @@ export default function PreventiveMaintenancePage() {
             <p className="text-2xl font-bold text-slate-900">
               {schedules.filter((s) => s.procedure_id).length}
             </p>
-            <p className="text-[10px] text-slate-400">Module 4 SOPs linked</p>
+            <p className="text-[10px] text-slate-400">Standard SOPs linked</p>
           </div>
         </div>
 

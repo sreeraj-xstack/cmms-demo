@@ -90,7 +90,7 @@ export default function AIFixMatcherModal({
             <p className="font-bold text-slate-900">{problemStatement}</p>
           </div>
           <span className="px-2.5 py-1 text-[10px] font-extrabold bg-amber-500 text-slate-950 rounded-lg shrink-0">
-            Requirement 7.04 AI
+            AI Diagnostic Engine
           </span>
         </div>
 

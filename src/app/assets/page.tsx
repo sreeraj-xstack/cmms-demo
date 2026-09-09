@@ -45,6 +45,25 @@ export default function AssetsPage() {
     loadData();
   }, [filters]);
 
+  // Listen for dynamic QR URL parameters (e.g. /assets?assetId=...)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && assets.length > 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const assetIdParam = urlParams.get('assetId');
+      if (assetIdParam) {
+        const query = assetIdParam.trim().toLowerCase();
+        const found = assets.find(
+          (a) =>
+            a.id.toLowerCase() === query ||
+            a.asset_tag.toLowerCase() === query
+        );
+        if (found) {
+          setSelectedAsset(found);
+        }
+      }
+    }
+  }, [assets]);
+
   const uniqueMachineTypes = useMemo(() => {
     const types = new Set(assets.map((a) => a.machine_type));
     return Array.from(types);

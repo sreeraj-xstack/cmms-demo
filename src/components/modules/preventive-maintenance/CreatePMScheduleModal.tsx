@@ -141,7 +141,7 @@ export default function CreatePMScheduleModal({
           {/* SOP Procedure Selection */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Attached SOP Checklist (Module 4)
+              Attached SOP Checklist
             </label>
             <select
               value={procedureId}
@@ -170,7 +170,7 @@ export default function CreatePMScheduleModal({
                   <h4 className="text-xs font-bold text-slate-900 flex items-center gap-2">
                     AI Preventive Optimization Engine
                     <span className="px-2 py-0.5 text-[10px] bg-amber-500 text-black font-extrabold rounded-full uppercase">
-                      Module 5 AI
+                      AI Optimizer
                     </span>
                   </h4>
                   <p className="text-[11px] text-slate-500">

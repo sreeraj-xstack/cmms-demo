@@ -27,7 +27,7 @@ import SparePartModalForm from '@/components/modules/inventory/SparePartModalFor
 import SparePartDetailsDrawer from '@/components/modules/inventory/SparePartDetailsDrawer';
 
 export default function SparePartInventoryPage() {
-  const [parts, setParts] = useState<SparePart[]>([]);
+  const [allParts, setAllParts] = useState<SparePart[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Filters State
@@ -46,13 +46,33 @@ export default function SparePartInventoryPage() {
 
   useEffect(() => {
     loadData();
-  }, [filters]);
+  }, []);
+
+  // Listen for dynamic QR URL parameters (e.g. /inventory?partId=...)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && allParts.length > 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const partIdParam = urlParams.get('partId');
+      if (partIdParam) {
+        const query = partIdParam.trim().toLowerCase();
+        const found = allParts.find(
+          (p) =>
+            p.id.toLowerCase() === query ||
+            p.part_number.toLowerCase() === query
+        );
+        if (found) {
+          setSelectedPart(found);
+          setIsDrawerOpen(true);
+        }
+      }
+    }
+  }, [allParts]);
 
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const data = await fetchSpareParts(filters);
-      setParts(data);
+      const data = await fetchSpareParts(); // Fetch master catalog
+      setAllParts(data);
     } catch (err) {
       console.error('Error fetching spare parts:', err);
     } finally {
@@ -60,33 +80,33 @@ export default function SparePartInventoryPage() {
     }
   };
 
-  // Derive unique categories and machine types for filter dropdowns
+  // Derive unique categories and machine types from overall master catalog
   const categories = useMemo(() => {
     const cats = new Set<SparePartCategory>();
-    parts.forEach((p) => cats.add(p.category));
+    allParts.forEach((p) => cats.add(p.category));
     return Array.from(cats);
-  }, [parts]);
+  }, [allParts]);
 
   const machineTypes = useMemo(() => {
     const mts = new Set<string>();
-    parts.forEach((p) => {
+    allParts.forEach((p) => {
       if (p.compatible_machine_type) mts.add(p.compatible_machine_type);
     });
     return Array.from(mts);
-  }, [parts]);
+  }, [allParts]);
 
-  // Compute KPI Stats
+  // Compute Overall Plant KPI Stats (Constant regardless of filters)
   const kpis = useMemo(() => {
-    const totalItems = parts.length;
-    const healthyItems = parts.filter((p) => p.quantity_available > p.min_quantity).length;
-    const lowStockItems = parts.filter(
+    const totalItems = allParts.length;
+    const healthyItems = allParts.filter((p) => p.quantity_available > p.min_quantity).length;
+    const lowStockItems = allParts.filter(
       (p) => p.quantity_available > 0 && p.quantity_available <= p.min_quantity
     );
-    const outOfStockItems = parts.filter((p) => p.quantity_available <= 0);
+    const outOfStockItems = allParts.filter((p) => p.quantity_available <= 0);
     const totalReorderAlerts = lowStockItems.length + outOfStockItems.length;
 
-    const totalValuation = parts.reduce(
-      (acc, p) => acc + p.unit_cost * Math.max(0, p.quantity_available),
+    const totalValuation = allParts.reduce(
+      (acc, p) => acc + (p.unit_cost || 0) * Math.max(0, p.quantity_available || 0),
       0
     );
 
@@ -99,7 +119,67 @@ export default function SparePartInventoryPage() {
       totalValuation,
       criticalReorderList: [...outOfStockItems, ...lowStockItems],
     };
-  }, [parts]);
+  }, [allParts]);
+
+  // Filtered Parts for Data Table
+  const displayedParts = useMemo(() => {
+    let result = [...allParts];
+
+    if (filters.searchQuery && filters.searchQuery.trim() !== '') {
+      const q = filters.searchQuery.trim().toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.part_number.toLowerCase().includes(q) ||
+          p.storage_location.toLowerCase().includes(q) ||
+          (p.vendor_name && p.vendor_name.toLowerCase().includes(q)) ||
+          (p.compatible_machine_type && p.compatible_machine_type.toLowerCase().includes(q))
+      );
+    }
+
+    if (filters.category && filters.category !== 'all') {
+      result = result.filter((p) => p.category === filters.category);
+    }
+
+    if (filters.machineType && filters.machineType !== 'all') {
+      result = result.filter((p) =>
+        p.compatible_machine_type.toLowerCase().includes(filters.machineType.toLowerCase())
+      );
+    }
+
+    if (filters.stockAlert && filters.stockAlert !== 'all') {
+      if (filters.stockAlert === 'out_of_stock') {
+        result = result.filter((p) => p.quantity_available <= 0);
+      } else if (filters.stockAlert === 'low_stock') {
+        result = result.filter(
+          (p) => p.quantity_available > 0 && p.quantity_available <= p.min_quantity
+        );
+      } else if (filters.stockAlert === 'in_stock') {
+        result = result.filter((p) => p.quantity_available > p.min_quantity);
+      }
+    }
+
+    const sortBy = filters.sortBy || 'lowest_stock_ratio';
+    result.sort((a, b) => {
+      if (sortBy === 'lowest_stock_ratio') {
+        const ratioA = a.min_quantity > 0 ? a.quantity_available / a.min_quantity : 999;
+        const ratioB = b.min_quantity > 0 ? b.quantity_available / b.min_quantity : 999;
+        return ratioA - ratioB;
+      }
+      if (sortBy === 'lead_time') {
+        return a.lead_time_days - b.lead_time_days;
+      }
+      if (sortBy === 'vendor') {
+        return (a.vendor_name || '').localeCompare(b.vendor_name || '');
+      }
+      if (sortBy === 'unit_cost') {
+        return b.unit_cost - a.unit_cost;
+      }
+      return 0;
+    });
+
+    return result;
+  }, [allParts, filters]);
 
   const handleCreateSubmit = async (input: CreateSparePartInput) => {
     await createSparePart(input);
@@ -124,7 +204,7 @@ export default function SparePartInventoryPage() {
       'Unit Cost (INR)',
       'Vendor Name',
     ];
-    const rows = parts.map((p) => [
+    const rows = displayedParts.map((p) => [
       p.part_number,
       `"${p.name.replace(/"/g, '""')}"`,
       p.category,
@@ -151,10 +231,10 @@ export default function SparePartInventoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex">
+    <div className="min-h-screen bg-stone-50 flex font-sans">
       <Sidebar />
 
-      <main className="flex-1 ml-64 p-8 space-y-6">
+      <main className="flex-1 ml-64 p-8 space-y-6 min-w-0 max-w-full overflow-x-hidden">
         {/* Top Header Banner */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
@@ -163,7 +243,7 @@ export default function SparePartInventoryPage() {
               Spare Part Inventory Vault
             </h1>
             <p className="text-xs text-slate-500">
-              Module 8 • Warehouse storekeeping, stock reorder thresholds & machine location mapping
+              Warehouse storekeeping, stock reorder thresholds & machine location mapping
             </p>
           </div>
 
@@ -317,7 +397,7 @@ export default function SparePartInventoryPage() {
 
         {/* Inventory Data Table */}
         <SparePartListTable
-          parts={parts}
+          parts={displayedParts}
           isLoading={isLoading}
           onSelectPart={handleSelectPart}
           onAdjustStock={handleSelectPart}

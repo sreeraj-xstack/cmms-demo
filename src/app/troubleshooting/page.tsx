@@ -71,7 +71,7 @@ export default function TroubleshootingPage() {
               Troubleshooting & 5-Why RCA Knowledge Base
             </h1>
             <p className="text-xs text-slate-500">
-              Module 7 Root Cause Analysis framework, AI Hit-Rate diagnostic matching & SOP procedure linking
+              Root Cause Analysis framework, AI Hit-Rate diagnostic matching & SOP procedure linking
             </p>
           </div>
 

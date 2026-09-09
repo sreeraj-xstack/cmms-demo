@@ -41,7 +41,7 @@ export function WorkProceduresList() {
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">Work Procedures & Checklists</h1>
             <span className="bg-amber-500/10 text-amber-900 border border-amber-500/30 text-[11px] font-bold px-2.5 py-0.5 rounded-full">
-              Module 4 SOP Master
+              SOP Master Library
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">

@@ -18,6 +18,8 @@ import {
 import { SparePart, SparePartCategory, StockMovement, StockMovementType } from '@/types/sparePart';
 import { CATEGORY_LABELS } from './SparePartFilters';
 import { fetchStockMovements, adjustSparePartStock } from '@/lib/services/sparePartService';
+import { QRCodeSVG } from '@/components/common/QRCodeSVG';
+import { generateQRPayload } from '@/lib/utils/qrUtils';
 
 interface SparePartDetailsDrawerProps {
   part: SparePart | null;
@@ -95,27 +97,27 @@ export default function SparePartDetailsDrawer({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/50 backdrop-blur-sm flex justify-end">
       <div className="bg-white w-full max-w-xl h-full shadow-2xl flex flex-col border-l border-slate-200 animate-in slide-in-from-right duration-300">
-        {/* Drawer Header */}
-        <div className="bg-slate-900 text-white p-6 flex items-start justify-between">
+        {/* Drawer Header (Light Stone Theme) */}
+        <div className="bg-stone-50 border-b border-slate-200 p-6 flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">
                 {part.part_number}
               </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
                 {CATEGORY_LABELS[part.category as SparePartCategory] || part.category}
               </span>
             </div>
-            <h2 className="text-lg font-bold text-white leading-snug">{part.name}</h2>
-            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-amber-400" /> Storage: {part.storage_location}
+            <h2 className="text-lg font-bold text-slate-900 leading-snug">{part.name}</h2>
+            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5 text-amber-600" /> Storage: {part.storage_location}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-white transition-all shrink-0"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -248,22 +250,57 @@ export default function SparePartDetailsDrawer({
                 </div>
               )}
 
-              {/* QR Tag */}
-              <div className="flex items-center justify-between p-4 bg-slate-900 text-white rounded-xl">
-                <div className="flex items-center gap-3">
-                  <QrCode className="w-8 h-8 text-amber-400" />
-                  <div>
-                    <span className="text-xs font-bold block text-white">Warehouse QR Tag</span>
-                    <span className="text-[11px] font-mono text-slate-400">{part.qr_code || `QR-${part.part_number}`}</span>
+              {/* QR Tag (Clean Light Theme) */}
+              <div className="p-4 bg-stone-50 border border-slate-200 text-slate-900 rounded-xl space-y-3 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <QrCode className="w-5 h-5 text-amber-600" />
+                    <div>
+                      <span className="text-xs font-bold block text-slate-900">Warehouse QR Inventory Tag</span>
+                      <span className="text-[10px] font-mono font-bold text-slate-500">SKU: {part.part_number}</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const payload = generateQRPayload('spare_part', {
+                        id: part.id,
+                        part_number: part.part_number,
+                        name: part.name,
+                        storage_location: part.storage_location,
+                        category: part.category,
+                      });
+                      navigator.clipboard.writeText(payload);
+                      alert(`Copied QR Link for ${part.part_number} to clipboard!`);
+                    }}
+                    className="px-3 py-1.5 text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-lg transition-colors shadow-2xs"
+                  >
+                    Copy QR Link
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-4 bg-white p-3 rounded-lg border border-slate-200 shadow-2xs">
+                  <QRCodeSVG
+                    value={generateQRPayload('spare_part', {
+                      id: part.id,
+                      part_number: part.part_number,
+                      name: part.name,
+                      storage_location: part.storage_location,
+                      category: part.category,
+                    })}
+                    size={88}
+                    className="shrink-0"
+                  />
+                  <div className="space-y-1">
+                    <p className="text-xs font-mono font-bold text-slate-900">{part.part_number}</p>
+                    <p className="text-[11px] text-slate-600">
+                      Rack Location: <strong>{part.storage_location}</strong>
+                    </p>
+                    <p className="text-[10px] text-slate-500">
+                      Scan at warehouse crib to open item details or execute stock issue.
+                    </p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => alert(`Printing QR Label for ${part.part_number}...`)}
-                  className="px-3 py-1.5 text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg transition-colors"
-                >
-                  Print QR Tag
-                </button>
               </div>
             </div>
           )}
