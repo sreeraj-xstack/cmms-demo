@@ -101,7 +101,7 @@ export default function ToolDetailsDrawer({
 
     try {
       setIsLoggingUsage(true);
-      const updated = await recordToolUsage(tool.id, metersToAdd, hoursToAdd, operatorName);
+      const updated = await recordToolUsage(tool.id, metersToAdd, `Operator ${operatorName}: +${metersToAdd}m (+${hoursToAdd}h)`, operatorName);
       setUsageSuccessMsg(
         updated?.status === 'dull'
           ? `Logged +${metersToAdd}m! Threshold exceeded: Tool status automatically updated to 'Dull'.`
@@ -635,11 +635,11 @@ export default function ToolDetailsDrawer({
                     >
                       <div>
                         <span className="font-bold text-slate-900 capitalize">
-                          {l.event_type.replace('_', ' ')}
+                          {(l.event_type || 'sharpening_completed').replace('_', ' ')}
                         </span>
                         <p className="text-slate-600 mt-1">{l.notes || 'Routine log'}</p>
                         <span className="text-[11px] text-slate-400 mt-0.5 block">
-                          By {l.performed_by} • {new Date(l.created_at).toLocaleString('en-IN')}
+                          By {l.performed_by || 'Tool Master'} • {new Date(l.created_at || Date.now()).toLocaleString('en-IN')}
                         </span>
                       </div>
                       <span className="font-mono font-bold text-slate-700">

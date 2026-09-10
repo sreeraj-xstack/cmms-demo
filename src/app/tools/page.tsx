@@ -36,6 +36,7 @@ export default function ToolManagementPage() {
     status: 'all',
     machineType: 'all',
     adapterCode: '',
+    sortBy: 'name',
   });
 
   // Modal & Drawer State
@@ -85,7 +86,7 @@ export default function ToolManagementPage() {
   // Derive unique categories and machine types from overall master catalog
   const categories = useMemo(() => {
     const cats = new Set<ToolCategory>();
-    allTools.forEach((t) => cats.add(t.category));
+    allTools.forEach((t) => cats.add(t.category as ToolCategory));
     return Array.from(cats);
   }, [allTools]);
 
@@ -104,7 +105,7 @@ export default function ToolManagementPage() {
     const dullOrSharpeningItems = allTools.filter(
       (t) => t.status === 'dull' || t.status === 'out_for_sharpening'
     ).length;
-    const scrappedItems = allTools.filter((t) => t.status === 'broken_scrapped' || !t.can_be_sharpened).length;
+    const scrappedItems = allTools.filter((t) => t.status === 'scrapped' || t.status === 'broken' || !t.can_be_sharpened).length;
     const lowStockItems = allTools.filter((t) => t.quantity_available <= t.min_quantity);
 
     const totalValuation = allTools.reduce(
@@ -122,7 +123,7 @@ export default function ToolManagementPage() {
     };
   }, [allTools]);
 
-  // Client-side Filtered Tools for Data Table
+  // Filtered Tools for Data Table
   const displayedTools = useMemo(() => {
     let result = [...allTools];
 
@@ -132,9 +133,11 @@ export default function ToolManagementPage() {
         (t) =>
           t.name.toLowerCase().includes(q) ||
           t.tool_number.toLowerCase().includes(q) ||
+          (t.storage_location && t.storage_location.toLowerCase().includes(q)) ||
+          (t.vendor_name && t.vendor_name.toLowerCase().includes(q)) ||
+          (t.compatible_machine_type && t.compatible_machine_type.toLowerCase().includes(q)) ||
           (t.adapter_code && t.adapter_code.toLowerCase().includes(q)) ||
-          (t.serial_number && t.serial_number.toLowerCase().includes(q)) ||
-          t.storage_location.toLowerCase().includes(q)
+          (t.serial_number && t.serial_number.toLowerCase().includes(q))
       );
     }
 
@@ -148,7 +151,7 @@ export default function ToolManagementPage() {
 
     if (filters.machineType && filters.machineType !== 'all') {
       result = result.filter((t) =>
-        t.compatible_machine_type.toLowerCase().includes(filters.machineType.toLowerCase())
+        t.compatible_machine_type && t.compatible_machine_type.toLowerCase().includes(filters.machineType.toLowerCase())
       );
     }
 

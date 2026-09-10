@@ -11,21 +11,21 @@ interface ToolFiltersProps {
   machineTypes: string[];
 }
 
-export const TOOL_CATEGORY_LABELS: Record<ToolCategory, string> = {
+export const TOOL_CATEGORY_LABELS: Record<string, string> = {
+  saw_blade: 'Saw Blades',
   saw_blades: 'Saw Blades',
+  router_bit: 'Router Bits',
   router_bits: 'Router Bits',
-  drill_bits: 'Drill Bits',
-  milling_cutters: 'Milling Cutters',
-  shaper_cutters: 'Shaper Cutters & Heads',
-  carbide_inserts: 'Carbide Knife Inserts',
-  adapters_collets: 'Adapters & Collets',
-  hand_powertools: 'Hand & Power Tools',
-  measuring_gauges: 'Measuring Gauges',
+  drill_bit: 'Drill Bits',
+  milling_cutter: 'Milling Cutters',
+  planer_knife: 'Planer Knives',
+  insert: 'Carbide Knife Inserts',
+  collet: 'Adapters & Collets',
   other: 'Other Special Tooling',
 };
 
 export const TOOL_STATUS_CONFIG: Record<
-  ToolStatus,
+  string,
   { label: string; bg: string; text: string; border: string; icon: React.ComponentType<{ className?: string }> }
 > = {
   available: {
@@ -34,6 +34,13 @@ export const TOOL_STATUS_CONFIG: Record<
     text: 'text-emerald-700',
     border: 'border-emerald-200',
     icon: ShieldCheck,
+  },
+  assigned: {
+    label: 'Assigned to Operator',
+    bg: 'bg-indigo-50',
+    text: 'text-indigo-700',
+    border: 'border-indigo-200',
+    icon: Wrench,
   },
   on_machine: {
     label: 'Mounted on Machine',
@@ -63,11 +70,25 @@ export const TOOL_STATUS_CONFIG: Record<
     border: 'border-teal-200',
     icon: ShieldCheck,
   },
-  broken_scrapped: {
-    label: 'Scrapped / Exhausted',
+  broken: {
+    label: 'Broken',
     bg: 'bg-rose-50',
-    text: 'text-rose-700',
+    text: 'text-rose-800',
     border: 'border-rose-200',
+    icon: XCircle,
+  },
+  scrapped: {
+    label: 'Scrapped',
+    bg: 'bg-rose-100',
+    text: 'text-rose-900',
+    border: 'border-rose-300',
+    icon: XCircle,
+  },
+  broken_scrapped: {
+    label: 'Scrapped / Retired',
+    bg: 'bg-rose-100',
+    text: 'text-rose-900',
+    border: 'border-rose-300',
     icon: XCircle,
   },
 };
