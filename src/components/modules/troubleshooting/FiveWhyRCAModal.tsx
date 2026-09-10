@@ -295,7 +295,7 @@ export default function FiveWhyRCAModal({
           <div>
             <label className="text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5">
               <FileCheck className="w-3.5 h-3.5 text-emerald-600" />
-              Link Standard SOP Fix Checklist
+              Link Module 4 SOP Fix Checklist (7.05)
             </label>
             <select
               value={linkedProcedureId}

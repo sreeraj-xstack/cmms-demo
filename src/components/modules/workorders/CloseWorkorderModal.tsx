@@ -129,7 +129,7 @@ export function CloseWorkorderModal({
               className="rounded-xs text-amber-600 focus:ring-amber-500"
             />
             <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
-              <BookOpen className="h-4 w-4 text-amber-600" /> Publish Solution to Solution Library Vault
+              <BookOpen className="h-4 w-4 text-amber-600" /> Publish Solution to Solution Library Vault (Module 2)
             </span>
           </label>
           <p className="text-[11px] text-amber-800 pl-6">
