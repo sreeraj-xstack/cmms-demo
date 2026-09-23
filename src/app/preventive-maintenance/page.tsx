@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import {
   Calendar as CalendarIcon,
   Plus,
@@ -102,10 +102,8 @@ export default function PreventiveMaintenancePage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex">
-      <Sidebar />
-
-      <main className="flex-1 ml-64 p-8 space-y-6">
+    <AppLayout>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header & Title Section */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
@@ -118,11 +116,11 @@ export default function PreventiveMaintenancePage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <button
               onClick={handleGenerateWOs}
               disabled={isGeneratingWOs}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-stone-50 border border-slate-200 rounded-xl transition-all shadow-xs disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-stone-50 border border-slate-200 rounded-xl transition-all shadow-xs disabled:opacity-50 w-full sm:w-auto"
             >
               <RefreshCw className={`w-4 h-4 text-amber-600 ${isGeneratingWOs ? 'animate-spin' : ''}`} />
               {isGeneratingWOs ? 'Generating...' : 'Run Auto-PM Engine'}
@@ -130,7 +128,7 @@ export default function PreventiveMaintenancePage() {
 
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-600 rounded-xl shadow-xs transition-all"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-600 rounded-xl shadow-xs transition-all w-full sm:w-auto"
             >
               <Plus className="w-4 h-4" />
               New PM Routine Schedule
@@ -333,7 +331,7 @@ export default function PreventiveMaintenancePage() {
             </div>
           )}
         </div>
-      </main>
+      </div>
 
       {/* Modal for Creating PM Schedule */}
       <CreatePMScheduleModal
@@ -352,6 +350,6 @@ export default function PreventiveMaintenancePage() {
         schedule={selectedPmSchedule}
         onClose={() => setSelectedPmSchedule(null)}
       />
-    </div>
+    </AppLayout>
   );
 }

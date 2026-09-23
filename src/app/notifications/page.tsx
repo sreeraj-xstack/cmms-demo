@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { AppNotification } from '@/types/notification';
 import { fetchNotifications, markNotificationAsRead } from '@/lib/services/notificationService';
 import { useAuth } from '@/context/AuthContext';
@@ -36,11 +36,8 @@ export default function NotificationsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      <Sidebar />
-
-      <main className="pl-64">
-        <div className="max-w-4xl mx-auto p-6 md:p-10 space-y-6">
+    <AppLayout>
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-10 space-y-6">
           {/* Header Title */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
@@ -63,7 +60,7 @@ export default function NotificationsPage() {
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+          <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto whitespace-nowrap">
             <button
               onClick={() => setFilter('all')}
               className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
@@ -110,13 +107,13 @@ export default function NotificationsPage() {
               {filteredNotifications.map((n) => (
                 <div
                   key={n.id}
-                  className={`rounded-2xl border p-4 transition-all flex items-start justify-between gap-4 shadow-xs ${
+                  className={`rounded-2xl border p-4 transition-all flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 shadow-xs min-w-0 w-full max-w-full ${
                     n.is_read
                       ? 'bg-white border-slate-200'
                       : 'bg-amber-500/5 border-amber-500/30'
                   }`}
                 >
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
                     <div className={`flex h-9 w-9 items-center justify-center rounded-xl flex-shrink-0 ${
                       n.type === 'major_breakdown'
                         ? 'bg-slate-900 text-amber-400'
@@ -133,10 +130,10 @@ export default function NotificationsPage() {
                       )}
                     </div>
 
-                    <div className="space-y-0.5">
-                      <h4 className="text-xs font-bold text-slate-900">{n.title}</h4>
-                      <p className="text-xs text-slate-600 leading-relaxed">{n.message}</p>
-                      <span className="text-[10px] text-slate-400 font-mono block pt-1">
+                    <div className="space-y-0.5 min-w-0 flex-1">
+                      <h4 className="text-xs font-bold text-slate-900 break-words">{n.title}</h4>
+                      <p className="text-xs text-slate-600 leading-relaxed break-words">{n.message}</p>
+                      <span className="text-[10px] text-slate-400 font-mono block pt-1 truncate">
                         {new Date(n.created_at).toLocaleString()}
                       </span>
                     </div>
@@ -146,7 +143,7 @@ export default function NotificationsPage() {
                     <button
                       onClick={() => handleMarkAsRead(n.id)}
                       title="Mark as Read"
-                      className="flex items-center gap-1 text-[11px] font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-400/40 px-2.5 py-1 rounded-lg transition-all flex-shrink-0"
+                      className="flex items-center justify-center gap-1 text-[11px] font-semibold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-400/40 px-2.5 py-1 rounded-lg transition-all shrink-0 w-full sm:w-auto"
                     >
                       <Check className="h-3.5 w-3.5" />
                       Mark Read
@@ -157,7 +154,6 @@ export default function NotificationsPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }

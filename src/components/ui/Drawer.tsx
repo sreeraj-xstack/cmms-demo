@@ -37,7 +37,7 @@ export function Drawer({
 
       <div className={`relative w-full ${maxWidthClass} h-full bg-white shadow-2xl flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-200 z-10`}>
         {/* Drawer Header */}
-        <div className="p-6 border-b border-slate-100 bg-stone-50 space-y-2">
+        <div className="p-4 sm:p-6 border-b border-slate-100 bg-stone-50 space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {badge}
@@ -45,20 +45,20 @@ export function Drawer({
 
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg transition-colors"
+              className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg transition-colors cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
           <div>
-            <h1 className="text-lg font-bold text-slate-900 leading-snug">{title}</h1>
+            <h1 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">{title}</h1>
             {subtitle && <p className="text-xs text-slate-500 font-medium">{subtitle}</p>}
           </div>
         </div>
 
         {/* Drawer Body */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {children}
         </div>
       </div>

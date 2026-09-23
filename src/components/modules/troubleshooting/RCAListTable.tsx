@@ -38,8 +38,52 @@ export default function RCAListTable({ rcas, onSelectRCA }: RCAListTableProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
-      <div className="overflow-x-auto">
+    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs min-w-0 w-full max-w-full">
+      {/* Mobile/Tablet Card View (< lg) */}
+      <div className="lg:hidden divide-y divide-slate-100">
+        {rcas.map((rca) => (
+          <div
+            key={rca.id}
+            onClick={() => onSelectRCA && onSelectRCA(rca)}
+            className="p-4 space-y-3 hover:bg-stone-50/80 active:bg-amber-50/40 transition-colors cursor-pointer"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="space-y-1">
+                <span className="inline-block font-mono text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
+                  {rca.rca_number}
+                </span>
+                <h4 className="font-bold text-slate-900 text-sm leading-snug">
+                  {rca.problem_statement}
+                </h4>
+              </div>
+              <span className="px-2 py-0.5 text-[10px] font-black bg-amber-500 text-slate-950 rounded-md shrink-0">
+                {rca.ai_hit_rate_score}% Match
+              </span>
+            </div>
+
+            <div className="bg-stone-50 rounded-xl p-2.5 border border-slate-100 space-y-1">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Root Cause (Why 5)</p>
+              <p className="text-xs text-slate-700 font-medium">{rca.why_5_root_cause}</p>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-slate-600">
+              <div className="flex items-center gap-1.5 font-semibold text-slate-800">
+                <Cpu className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span>{rca.asset_name}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {getCategoryBadge(rca.root_cause_category)}
+                <span className="text-[11px] text-slate-500 flex items-center gap-1">
+                  <ThumbsUp className="w-3 h-3 text-slate-400" /> {rca.feedback_upvotes}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View (>= lg) */}
+      <div className="hidden lg:block overflow-x-auto min-w-0 max-w-full">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-200 bg-stone-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider">

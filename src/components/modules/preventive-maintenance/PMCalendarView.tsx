@@ -134,7 +134,8 @@ export default function PMCalendarView({ events, filters, onEventClick }: PMCale
     const firstDayIndex = new Date(year, month, 1).getDay();
 
     return (
-      <div className="space-y-2">
+      <div className="overflow-x-auto pb-2">
+        <div className="min-w-[640px] space-y-2">
         {/* Days Header */}
         <div className="grid grid-cols-7 gap-2 text-center">
           {daysOfWeek.map((d) => (
@@ -211,6 +212,7 @@ export default function PMCalendarView({ events, filters, onEventClick }: PMCale
           })}
         </div>
       </div>
+    </div>
     );
   };
 
@@ -399,7 +401,7 @@ export default function PMCalendarView({ events, filters, onEventClick }: PMCale
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
+    <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-xs space-y-6 min-w-0 w-full max-w-full overflow-hidden">
       {/* Calendar Top Navigation Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">

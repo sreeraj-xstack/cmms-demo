@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Asset, AssetStatus, AssetCriticality } from '@/types/asset';
-import { QrCode, Eye, MapPin, Tag, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { QrCode, Eye, MapPin, Tag, AlertTriangle, ShieldAlert, FileText } from 'lucide-react';
 
 interface AssetListTableProps {
   assets: Asset[];
@@ -88,8 +88,74 @@ export function AssetListTable({ assets, onSelectAsset, onOpenQRCode, onOpenDoss
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
-      <div className="overflow-x-auto">
+    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs min-w-0 w-full max-w-full">
+      {/* Mobile/Tablet Card View (< lg) */}
+      <div className="lg:hidden divide-y divide-slate-100">
+        {assets.map((asset) => (
+          <div
+            key={asset.id}
+            onClick={() => onSelectAsset(asset)}
+            className="p-4 space-y-3 hover:bg-stone-50/80 active:bg-amber-50/40 transition-colors cursor-pointer"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="space-y-1">
+                <span className="inline-block font-mono text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-500/20">
+                  {asset.asset_tag}
+                </span>
+                <h4 className="font-bold text-slate-900 text-sm leading-snug">
+                  {asset.name}
+                </h4>
+                {asset.model && (
+                  <p className="text-[11px] text-slate-400">Model: {asset.model}</p>
+                )}
+              </div>
+              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                {getStatusBadge(asset.status)}
+                {getCriticalityBadge(asset.criticality)}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 pt-1">
+              <span className="font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md text-[11px]">
+                {asset.machine_type}
+              </span>
+              <span className="flex items-center gap-1 text-slate-500 text-[11px]">
+                <MapPin className="h-3 w-3 text-slate-400" />
+                {asset.location}
+              </span>
+            </div>
+
+            {/* Quick Actions Bar */}
+            <div
+              className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="text-[11px] text-slate-400">Tap card to inspect asset</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => onOpenQRCode(asset)}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-amber-50 text-slate-700 text-xs font-semibold shadow-2xs"
+                  title="Print QR Tag"
+                >
+                  <QrCode className="h-3.5 w-3.5 text-amber-600" /> QR
+                </button>
+                {onOpenDossier && (
+                  <button
+                    onClick={() => onOpenDossier(asset)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-blue-50 text-slate-700 text-xs font-semibold shadow-2xs"
+                    title="Machine Dossier & Vault"
+                  >
+                    <FileText className="h-3.5 w-3.5 text-blue-600" /> Dossier
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View (>= lg) */}
+      <div className="hidden lg:block overflow-x-auto min-w-0 max-w-full">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-200 bg-stone-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
@@ -98,6 +164,7 @@ export function AssetListTable({ assets, onSelectAsset, onOpenQRCode, onOpenDoss
               <th className="py-3 px-4">Location</th>
               <th className="py-3 px-4">Criticality</th>
               <th className="py-3 px-4">Status</th>
+              <th className="py-3 px-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-xs">
@@ -140,6 +207,28 @@ export function AssetListTable({ assets, onSelectAsset, onOpenQRCode, onOpenDoss
 
                 {/* Status */}
                 <td className="py-3.5 px-4">{getStatusBadge(asset.status)}</td>
+
+                {/* Quick Actions (QR & Dossier) */}
+                <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center justify-end gap-1.5">
+                    <button
+                      onClick={() => onOpenQRCode(asset)}
+                      className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-amber-50 hover:border-amber-300 text-slate-600 hover:text-amber-800 transition-colors shadow-2xs"
+                      title="Print QR Tag"
+                    >
+                      <QrCode className="h-3.5 w-3.5" />
+                    </button>
+                    {onOpenDossier && (
+                      <button
+                        onClick={() => onOpenDossier(asset)}
+                        className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-blue-50 hover:border-blue-300 text-slate-600 hover:text-blue-800 transition-colors shadow-2xs"
+                        title="Machine Dossier & Vault"
+                      >
+                        <FileText className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>

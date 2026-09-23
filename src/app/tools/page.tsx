@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import {
   Wrench,
   Plus,
@@ -224,10 +224,8 @@ export default function ToolManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex font-sans">
-      <Sidebar />
-
-      <main className="flex-1 ml-64 p-8 space-y-6 min-w-0 max-w-full overflow-x-hidden">
+    <AppLayout>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 min-w-0 max-w-full">
         {/* Top Header Banner */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
@@ -387,7 +385,7 @@ export default function ToolManagementPage() {
           onSendSharpening={handleSelectTool}
           onOpenQR={(tool) => setQrTool(tool)}
         />
-      </main>
+      </div>
 
       {/* Tool Item Creation Modal */}
       <ToolModalForm
@@ -425,6 +423,6 @@ export default function ToolManagementPage() {
         tools={displayedTools}
         onSelectTool={handleSelectTool}
       />
-    </div>
+    </AppLayout>
   );
 }

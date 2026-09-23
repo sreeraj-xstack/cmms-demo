@@ -244,10 +244,10 @@ export function WorkorderDetailsDrawer({
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex border-b border-slate-200 bg-white">
+          <div className="flex border-b border-slate-200 bg-white overflow-x-auto whitespace-nowrap">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all ${
+              className={`shrink-0 px-3 sm:px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer ${
                 activeTab === 'overview' ? 'border-amber-500 text-amber-900' : 'border-transparent text-slate-500'
               }`}
             >

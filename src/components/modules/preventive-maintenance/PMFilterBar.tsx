@@ -24,12 +24,12 @@ export default function PMFilterBar({
   assets,
 }: PMFilterBarProps) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-xs">
+    <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-6 shadow-xs min-w-0 w-full max-w-full">
       <div className="flex flex-wrap items-center justify-between gap-4">
         {/* Left Side: View Mode Selection & Filters */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
           {/* View Mode Toggle */}
-          <div className="inline-flex rounded-xl p-1 bg-stone-100 border border-slate-200">
+          <div className="inline-flex rounded-xl p-1 bg-stone-100 border border-slate-200 overflow-x-auto max-w-full">
             {(['month', 'week', 'day'] as const).map((view) => (
               <button
                 key={view}
@@ -46,7 +46,7 @@ export default function PMFilterBar({
           </div>
 
           {/* Search Input */}
-          <div className="relative min-w-[220px]">
+          <div className="relative w-full sm:w-auto sm:min-w-[220px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"

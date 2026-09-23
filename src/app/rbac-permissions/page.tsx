@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { Shield, UserCheck, Key, CheckCircle2, Lock } from 'lucide-react';
 import { UserRole } from '@/types/auth';
 
@@ -11,7 +11,7 @@ export default function RbacPermissionsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-stone-50 pl-64">
+      <div className="flex min-h-screen items-center justify-center bg-stone-50 lg:pl-64">
         <div className="text-xs text-slate-500 animate-pulse font-medium">
           Connecting to Supabase Session...
         </div>
@@ -33,13 +33,8 @@ export default function RbacPermissionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      {/* Fixed Sidebar */}
-      <Sidebar />
-
-      {/* Main Content Area */}
-      <main className="pl-64">
-        <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-6">
+    <AppLayout>
+      <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-10 space-y-6">
           {/* Role Permissions Matrix */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -181,7 +176,6 @@ export default function RbacPermissionsPage() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+    </AppLayout>
   );
 }

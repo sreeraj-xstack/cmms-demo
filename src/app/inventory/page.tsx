@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import {
   Package,
   Plus,
@@ -231,10 +231,8 @@ export default function SparePartInventoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex font-sans">
-      <Sidebar />
-
-      <main className="flex-1 ml-64 p-8 space-y-6 min-w-0 max-w-full overflow-x-hidden">
+    <AppLayout>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 min-w-0 max-w-full">
         {/* Top Header Banner */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
@@ -402,7 +400,7 @@ export default function SparePartInventoryPage() {
           onSelectPart={handleSelectPart}
           onAdjustStock={handleSelectPart}
         />
-      </main>
+      </div>
 
       {/* Item Creation Modal */}
       <SparePartModalForm
@@ -419,6 +417,6 @@ export default function SparePartInventoryPage() {
         onClose={() => setIsDrawerOpen(false)}
         onStockUpdated={loadData}
       />
-    </div>
+    </AppLayout>
   );
 }

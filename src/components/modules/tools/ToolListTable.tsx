@@ -56,8 +56,89 @@ export default function ToolListTable({
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
-      <div className="overflow-x-auto">
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden min-w-0 w-full max-w-full">
+      {/* Mobile/Tablet Card View (< lg) */}
+      <div className="lg:hidden divide-y divide-slate-100">
+        {tools.map((tool) => {
+          const statusCfg = TOOL_STATUS_CONFIG[tool.status as ToolStatus] || TOOL_STATUS_CONFIG.available;
+          const StatusIcon = statusCfg.icon;
+
+          const sharpeningCyclesCompleted = tool.sharpening_cycles_completed ?? 0;
+          const maxSharpeningCycles = tool.max_sharpening_cycles ?? 5;
+          const cuttingMeters = tool.cutting_meters ?? 0;
+          const maxMetersPerCycle = tool.max_meters_per_cycle ?? 5000;
+          const isMaxSharpened = sharpeningCyclesCompleted >= maxSharpeningCycles;
+          const meterRatio = maxMetersPerCycle > 0 ? (cuttingMeters / maxMetersPerCycle) * 100 : 0;
+
+          return (
+            <div
+              key={tool.id}
+              onClick={() => onSelectTool(tool)}
+              className="p-4 space-y-3 hover:bg-stone-50/80 active:bg-amber-50/40 transition-colors cursor-pointer"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="inline-block font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                      {tool.tool_number}
+                    </span>
+                    {tool.adapter_code && (
+                      <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-300">
+                        Collet: {tool.adapter_code}
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="font-bold text-slate-900 text-sm leading-snug">
+                    {tool.name}
+                  </h4>
+                  {tool.diameter_mm && (
+                    <p className="text-[11px] text-slate-500 font-medium">Diameter: Ø{tool.diameter_mm}mm</p>
+                  )}
+                </div>
+
+                <span
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border shrink-0 ${statusCfg.bg} ${statusCfg.text} ${statusCfg.border}`}
+                >
+                  <StatusIcon className="w-3 h-3" />
+                  {statusCfg.label}
+                </span>
+              </div>
+
+              {/* Cutting Meters Progress */}
+              <div className="space-y-1 bg-stone-50 p-2.5 rounded-xl border border-slate-100">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium text-slate-700">
+                    Cutting Meters: {cuttingMeters.toLocaleString()}m / {maxMetersPerCycle.toLocaleString()}m
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-500">{Math.round(meterRatio)}%</span>
+                </div>
+                <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      meterRatio >= 90 ? 'bg-red-500' : meterRatio >= 75 ? 'bg-amber-500' : 'bg-blue-500'
+                    }`}
+                    style={{ width: `${Math.min(meterRatio, 100)}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-slate-600">
+                <span className={`inline-flex items-center gap-1 font-semibold px-2 py-0.5 rounded text-[11px] ${
+                  isMaxSharpened ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-700'
+                }`}>
+                  Regrind: {sharpeningCyclesCompleted} of {maxSharpeningCycles} cycles
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  {tool.compatible_machine_type || tool.storage_location || 'Tool Crib'}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop Table View (>= lg) */}
+      <div className="hidden lg:block overflow-x-auto min-w-0 max-w-full">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600 uppercase tracking-wider">

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import { Asset, AssetFiltersState, CreateAssetInput, AssetStatus } from '@/types/asset';
 import { fetchAssets, createAsset, updateAssetStatus } from '@/lib/services/assetService';
 import { AssetFilters } from '@/components/modules/assets/AssetFilters';
@@ -97,13 +97,8 @@ export default function AssetsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      {/* Fixed Sidebar */}
-      <Sidebar />
-
-      {/* Main Content Area */}
-      <main className="pl-64">
-        <div className="max-w-6xl mx-auto p-6 md:p-10 space-y-6">
+    <AppLayout>
+      <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-10 space-y-6">
           {/* Header Title & Actions */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
@@ -197,7 +192,6 @@ export default function AssetsPage() {
             onOpenDossier={(asset) => setDossierAssetId(asset.id)}
           />
         </div>
-      </main>
 
       {/* Register Asset Modal */}
       <AssetModalForm
@@ -225,6 +219,6 @@ export default function AssetsPage() {
         assetId={dossierAssetId}
         onClose={() => setDossierAssetId(null)}
       />
-    </div>
+    </AppLayout>
   );
 }

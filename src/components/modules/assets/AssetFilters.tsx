@@ -21,8 +21,8 @@ export function AssetFilters({ filters, onFilterChange, machineTypes }: AssetFil
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-3">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs space-y-3 min-w-0 w-full max-w-full">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         {/* Search Bar */}
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400" />

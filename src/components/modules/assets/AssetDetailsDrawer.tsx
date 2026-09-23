@@ -38,8 +38,8 @@ export function AssetDetailsDrawer({ asset, onClose, onStatusChange }: AssetDeta
     <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/30 backdrop-blur-xs">
       <div className="absolute inset-0" onClick={onClose} />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-lg bg-white border-l border-slate-200 shadow-2xl p-6 overflow-y-auto space-y-6 animate-in slide-in-from-right duration-200">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
+        <div className="w-screen max-w-lg bg-white border-l border-slate-200 shadow-2xl p-4 sm:p-6 overflow-y-auto space-y-6 animate-in slide-in-from-right duration-200">
           {/* Top Bar Header */}
           <div className="flex items-start justify-between border-b border-slate-100 pb-4">
             <div className="space-y-1">

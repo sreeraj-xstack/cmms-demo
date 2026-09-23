@@ -104,8 +104,64 @@ export function TicketListTable({ tickets, onSelectTicket }: TicketListTableProp
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
-      <div className="overflow-x-auto">
+    <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs min-w-0 w-full max-w-full">
+      {/* Mobile/Tablet Card View (< lg) */}
+      <div className="lg:hidden divide-y divide-slate-100">
+        {tickets.map((ticket) => (
+          <div
+            key={ticket.id}
+            onClick={() => onSelectTicket(ticket)}
+            className="p-4 space-y-3 hover:bg-stone-50/80 active:bg-amber-50/40 transition-colors cursor-pointer"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="space-y-1">
+                <span className="inline-block font-mono text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-500/20">
+                  {ticket.ticket_number}
+                </span>
+                <h4 className="font-bold text-slate-900 text-sm leading-snug">
+                  {ticket.asset_name}
+                </h4>
+                <p className="text-[11px] text-slate-400 font-mono">Tag: {ticket.asset_tag}</p>
+              </div>
+              <div className="flex flex-col items-end gap-1.5 shrink-0">
+                {getStatusBadge(ticket.status)}
+                {getCategoryBadge(ticket.breakdown_category)}
+              </div>
+            </div>
+
+            <div className="bg-stone-50 rounded-xl p-2.5 border border-slate-100 space-y-1">
+              <p className="text-xs font-bold text-slate-800">{ticket.issue_type}</p>
+              <p className="text-[11px] text-slate-500 line-clamp-2">{ticket.description}</p>
+              <p className="text-[10px] text-slate-400 pt-0.5">Reported by: {ticket.reported_by_name}</p>
+            </div>
+
+            <div
+              className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-2">
+                {getApprovalBadge(ticket.manager_approval_status)}
+                {ticket.attachments && ticket.attachments.length > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                    <Paperclip className="h-3 w-3 text-amber-600" />
+                    {ticket.attachments.length} media
+                  </span>
+                )}
+              </div>
+
+              <button
+                onClick={() => onSelectTicket(ticket)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-amber-50 text-slate-700 text-xs font-semibold shadow-2xs"
+              >
+                <Eye className="h-3.5 w-3.5 text-amber-600" /> Triage
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View (>= lg) */}
+      <div className="hidden lg:block overflow-x-auto min-w-0 max-w-full">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-200 bg-stone-50 text-[11px] font-bold text-slate-600 uppercase tracking-wider">

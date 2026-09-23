@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import {
   fetchExecutiveDashboardData,
   DashboardFilterOptions,
@@ -86,10 +86,8 @@ export default function ExecutiveDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex font-sans">
-      <Sidebar />
-
-      <main className="flex-1 ml-64 p-8 space-y-6 min-w-0 max-w-full overflow-x-hidden">
+    <AppLayout>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 min-w-0 max-w-full">
         {/* Top Header Banner */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
           <div className="space-y-1">
@@ -308,7 +306,7 @@ export default function ExecutiveDashboardPage() {
           isImportedActive={filters.useImportedData}
           onToggleImportedMode={(active) => setFilters({ ...filters, useImportedData: active })}
         />
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

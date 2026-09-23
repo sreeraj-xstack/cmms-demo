@@ -91,11 +91,11 @@ export default function DashboardFiltersToolbar({
       {/* Top Filter Action Row */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
         {/* Left: Timeframe Tabs (Requirement 10.02) */}
-        <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold">
-          <Calendar className="w-4 h-4 text-slate-400 ml-2 mr-1" />
+        <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold overflow-x-auto max-w-full whitespace-nowrap">
+          <Calendar className="w-4 h-4 text-slate-400 ml-2 mr-1 shrink-0" />
           <button
             onClick={() => handleTimeframeChange('today')}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
+            className={`px-3 py-1.5 rounded-lg transition-all shrink-0 ${
               filters.timeframe === 'today'
                 ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'

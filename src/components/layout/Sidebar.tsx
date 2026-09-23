@@ -3,14 +3,34 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types/auth';
-import { Shield, LogOut, LayoutDashboard, ShieldCheck, Cpu, Wrench, Bell, BookOpen, ClipboardList, FileCheck, Calendar, HelpCircle, Package, Hammer } from 'lucide-react';
+import {
+  Shield,
+  LogOut,
+  LayoutDashboard,
+  ShieldCheck,
+  Cpu,
+  Wrench,
+  Bell,
+  BookOpen,
+  ClipboardList,
+  FileCheck,
+  Calendar,
+  HelpCircle,
+  Package,
+  Hammer,
+  X,
+} from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getUnreadCount } from '@/lib/services/notificationService';
-
 import Image from 'next/image';
 
-export function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
+}
+
+export function Sidebar({ mobileOpen = false, onCloseMobile }: SidebarProps = {}) {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -21,6 +41,7 @@ export function Sidebar() {
   }, [user, pathname]);
 
   const handleSignOut = async () => {
+    if (onCloseMobile) onCloseMobile();
     await signOut();
     router.push('/login');
   };
@@ -53,23 +74,35 @@ export function Sidebar() {
     { label: 'RBAC Permissions', href: '/rbac-permissions', icon: ShieldCheck },
   ];
 
-  return (
-    <aside className="fixed inset-y-0 left-0 z-40 w-64 border-r border-slate-200 bg-white flex flex-col justify-between p-5 shadow-xs">
+  const renderContent = (isMobileDrawer = false) => (
+    <div className="flex flex-col justify-between h-full space-y-6">
       {/* Top Section: Organization Details Heading */}
       <div className="space-y-6">
         <div className="space-y-2 pb-4 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <Image
-              src="/xstack-logo.webp"
-              alt="XStack Logo"
-              width={36}
-              height={36}
-              className="h-9 w-9 object-contain"
-              priority
-            />
-            <span className="text-xs font-black uppercase tracking-wider bg-stone-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
-              CMMS
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <Image
+                src="/xstack-logo.webp"
+                alt="XStack Logo"
+                width={36}
+                height={36}
+                className="h-9 w-9 object-contain"
+                priority
+              />
+              <span className="text-xs font-black uppercase tracking-wider bg-stone-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                CMMS
+              </span>
+            </div>
+
+            {isMobileDrawer && (
+              <button
+                onClick={onCloseMobile}
+                className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-stone-50 transition-colors"
+                aria-label="Close navigation menu"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
           <p className="text-xs text-slate-500 font-medium leading-snug">
             Plant Maintenance & Asset Management
@@ -85,10 +118,13 @@ export function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => {
+                  if (onCloseMobile) onCloseMobile();
+                }}
                 className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold transition-all ${
                   isActive
                     ? 'bg-amber-500/10 border border-amber-500/30 text-amber-900'
-                    : 'text-slate-600 hover:bg-stone-50 hover:text-slate-900'
+                    : 'text-slate-600 hover:bg-stone-50 hover:text-slate-900 active:bg-stone-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -129,12 +165,38 @@ export function Sidebar() {
           <button
             onClick={handleSignOut}
             title="Sign Out"
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 transition-all flex-shrink-0"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 transition-all flex-shrink-0 cursor-pointer"
           >
             <LogOut className="h-4 w-4" />
           </button>
         </div>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* 1. Desktop Fixed Sidebar */}
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 border-r border-slate-200 bg-white flex-col justify-between p-5 shadow-xs overflow-y-auto">
+        {renderContent(false)}
+      </aside>
+
+      {/* 2. Mobile Slide-Over Drawer with Backdrop Overlay */}
+      {mobileOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop Overlay */}
+          <div
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+            onClick={onCloseMobile}
+            aria-hidden="true"
+          />
+
+          {/* Off-Canvas Slide Drawer */}
+          <aside className="relative z-50 w-72 max-w-[85vw] bg-white border-r border-slate-200 flex flex-col justify-between p-5 shadow-2xl overflow-y-auto animate-in slide-in-from-left duration-200">
+            {renderContent(true)}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { AppLayout } from '@/components/layout/AppLayout';
 import {
   HelpCircle,
   Plus,
@@ -59,10 +59,8 @@ export default function TroubleshootingPage() {
   }, [filters]);
 
   return (
-    <div className="min-h-screen bg-stone-50 flex">
-      <Sidebar />
-
-      <main className="flex-1 ml-64 p-8 space-y-6">
+    <AppLayout>
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header Title Section */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
@@ -75,10 +73,10 @@ export default function TroubleshootingPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <button
               onClick={loadData}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-stone-50 border border-slate-200 rounded-xl transition-all shadow-xs"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-stone-50 border border-slate-200 rounded-xl transition-all shadow-xs w-full sm:w-auto"
             >
               <RefreshCw className={`w-4 h-4 text-slate-500 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -86,7 +84,7 @@ export default function TroubleshootingPage() {
 
             <button
               onClick={() => setIsRCAModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-600 rounded-xl shadow-xs transition-all"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-slate-950 bg-amber-500 hover:bg-amber-600 rounded-xl shadow-xs transition-all w-full sm:w-auto"
             >
               <Plus className="w-4 h-4" />
               New 5-Why RCA Entry
@@ -94,13 +92,11 @@ export default function TroubleshootingPage() {
           </div>
         </div>
 
-
-
         {/* Filter Controls */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs flex flex-wrap items-center justify-between gap-4 min-w-0 w-full max-w-full">
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             {/* Search */}
-            <div className="relative min-w-[240px]">
+            <div className="relative w-full sm:w-auto sm:min-w-[240px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
@@ -152,7 +148,7 @@ export default function TroubleshootingPage() {
 
         {/* RCA Master Table */}
         <RCAListTable rcas={rcas} onSelectRCA={(rca) => setSelectedRca(rca)} />
-      </main>
+      </div>
 
       {/* 5-Why RCA Modal Form */}
       <FiveWhyRCAModal
@@ -173,6 +169,6 @@ export default function TroubleshootingPage() {
           await loadData();
         }}
       />
-    </div>
+    </AppLayout>
   );
 }
