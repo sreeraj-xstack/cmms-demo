@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { UserRole } from '@/types/auth';
 import { Shield, ArrowRight, User, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
@@ -43,10 +44,15 @@ export default function SignupPage() {
     <div className="flex min-h-screen items-center justify-center bg-stone-50 p-4">
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500 text-slate-950 font-bold text-xl shadow-sm">
-            S
-          </div>
+        <div className="flex flex-col items-center text-center space-y-2.5">
+          <Image
+            src="/xstack-logo.webp"
+            alt="XStack Logo"
+            width={64}
+            height={64}
+            className="h-16 w-16 object-contain"
+            priority
+          />
           <h1 className="text-xl font-bold text-slate-900">
             Create Plant Account
           </h1>
@@ -184,6 +190,19 @@ export default function SignupPage() {
             </Link>
           </div>
         </div>
+
+        {/* Powered by XStack Minimal Footer */}
+        <footer className="text-center pt-2">
+          <a
+            href="https://xstack.ae/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <span>powered by</span>
+            <span className="font-semibold text-slate-600 hover:text-amber-600 transition-colors underline decoration-slate-300 underline-offset-2">xstack</span>
+          </a>
+        </footer>
       </div>
     </div>
   );

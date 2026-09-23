@@ -74,7 +74,10 @@ export function QRCodeModal({ asset, onClose }: QRCodeModalProps) {
         {/* Tag Printable Visual Card */}
         <div className="rounded-2xl border-2 border-slate-900 bg-white p-5 text-center space-y-4 shadow-sm print:m-0 print:border-2">
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-            <span className="text-[10px] font-extrabold text-slate-900 uppercase tracking-wider">SOBHA CMMS</span>
+            <div className="flex items-center gap-1.5">
+              <img src="/xstack-logo.webp" alt="XStack Logo" className="h-4 w-4 object-contain" />
+              <span className="text-[10px] font-extrabold text-slate-900 uppercase tracking-wider">XSTACK CMMS</span>
+            </div>
             <span className="font-mono text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-400/40">
               {asset.asset_tag}
             </span>

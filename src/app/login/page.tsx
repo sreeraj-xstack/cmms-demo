@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Shield, Eye, EyeOff, LogIn, Sparkles } from 'lucide-react';
+import Image from 'next/image';
+import { Eye, EyeOff, LogIn, Sparkles } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -42,16 +43,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl space-y-6">
         {/* Organization Brand Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600">
-            <Shield className="h-6 w-6" />
+        <div className="flex flex-col items-center text-center space-y-2.5">
+          <Image
+            src="/xstack-logo.webp"
+            alt="XStack Logo"
+            width={72}
+            height={72}
+            className="h-16 w-16 object-contain"
+            priority
+          />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-stone-100 border border-slate-200 text-xs font-black tracking-widest text-slate-700 uppercase">
+            CMMS
           </div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            XStack CMMS
-          </h1>
           <p className="text-xs text-slate-500 font-medium">
             Plant Maintenance & Asset Management System
           </p>
@@ -162,6 +168,19 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
+
+      {/* Powered by XStack Minimal Footer */}
+      <footer className="mt-6 text-center">
+        <a
+          href="https://xstack.ae/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          <span>powered by</span>
+          <span className="font-semibold text-slate-600 hover:text-amber-600 transition-colors underline decoration-slate-300 underline-offset-2">xstack</span>
+        </a>
+      </footer>
     </div>
   );
 }

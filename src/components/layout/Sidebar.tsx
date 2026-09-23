@@ -8,6 +8,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getUnreadCount } from '@/lib/services/notificationService';
 
+import Image from 'next/image';
+
 export function Sidebar() {
   const { user, signOut } = useAuth();
   const router = useRouter();
@@ -55,10 +57,20 @@ export function Sidebar() {
     <aside className="fixed inset-y-0 left-0 z-40 w-64 border-r border-slate-200 bg-white flex flex-col justify-between p-5 shadow-xs">
       {/* Top Section: Organization Details Heading */}
       <div className="space-y-6">
-        <div className="space-y-1 pb-4 border-b border-slate-100">
-          <h1 className="text-base font-bold text-slate-900 tracking-tight">
-            XStack CMMS
-          </h1>
+        <div className="space-y-2 pb-4 border-b border-slate-100">
+          <div className="flex items-center gap-2.5">
+            <Image
+              src="/xstack-logo.webp"
+              alt="XStack Logo"
+              width={36}
+              height={36}
+              className="h-9 w-9 object-contain"
+              priority
+            />
+            <span className="text-xs font-black uppercase tracking-wider bg-stone-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+              CMMS
+            </span>
+          </div>
           <p className="text-xs text-slate-500 font-medium leading-snug">
             Plant Maintenance & Asset Management
           </p>

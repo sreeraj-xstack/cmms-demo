@@ -6,6 +6,8 @@ import { UserRole } from '@/types/auth';
 import { Shield, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+import Image from 'next/image';
+
 export function Header() {
   const { user, signOut } = useAuth();
   const router = useRouter();
@@ -32,13 +34,19 @@ export function Header() {
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/90 backdrop-blur-md px-4 md:px-8 shadow-xs">
       {/* Brand Header */}
       <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500 text-slate-950 font-bold text-base shadow-sm">
-          S
-        </div>
+        <Image
+          src="/xstack-logo.webp"
+          alt="XStack Logo"
+          width={36}
+          height={36}
+          className="h-9 w-9 object-contain"
+          priority
+        />
         <div>
-          <h1 className="text-sm font-semibold tracking-tight text-slate-900">
-            Sobha Furniture CMMS
-          </h1>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-bold text-slate-900 tracking-tight">XStack</span>
+            <span className="text-[10px] font-black uppercase tracking-wider bg-stone-100 text-slate-700 px-1.5 py-0.5 rounded border border-slate-200">CMMS</span>
+          </div>
           <p className="text-[11px] text-slate-500">
             Plant Maintenance & Asset Management
           </p>
