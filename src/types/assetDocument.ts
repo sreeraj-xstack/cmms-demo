@@ -14,6 +14,7 @@ export interface AssetDocument {
   title: string;
   description?: string | null;
   file_url: string;
+  file_name?: string | null;
   file_size_bytes?: number | null;
   mime_type?: string | null;
   version?: string | null;

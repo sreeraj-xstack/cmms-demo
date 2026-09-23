@@ -331,9 +331,25 @@ export default function AssetDossierModal({ isOpen, onClose, assetId }: AssetDos
                         className="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between gap-3 hover:border-slate-300 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                            <FileText className="w-5 h-5" />
-                          </div>
+                          {doc.category === 'photo' ? (
+                            <div className="w-12 h-12 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0">
+                              <img
+                                src={doc.file_url}
+                                alt={doc.title}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.currentTarget;
+                                  if (!target.src.includes('/demo-media/')) {
+                                    target.src = `/demo-media/${doc.file_name || 'spindle_assembly.jpg'}`;
+                                  }
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="p-2 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0">
+                              <FileText className="w-5 h-5" />
+                            </div>
+                          )}
                           <div>
                             <div className="flex items-center gap-2">
                               <h5 className="text-xs font-bold text-slate-900">{doc.title}</h5>

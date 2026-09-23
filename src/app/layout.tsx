@@ -24,11 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/xstack-logo.webp" type="image/webp" />
       </head>
-      <body className={`${inter.className} bg-stone-50 text-slate-900 antialiased`}>
+      <body
+        suppressHydrationWarning
+        className={`${inter.className} bg-stone-50 text-slate-900 antialiased`}
+      >
         <AuthProvider>
           {children}
         </AuthProvider>

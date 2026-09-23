@@ -12,7 +12,7 @@ import { Drawer } from '@/components/ui/Drawer';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import FiveWhyRCAModal from '../troubleshooting/FiveWhyRCAModal';
 import AIFixMatcherModal from '../troubleshooting/AIFixMatcherModal';
-import { HelpCircle, Bot, MapPin, Clock, CheckCircle2, XCircle, Paperclip, UserCheck, MessageSquare, Send, ArrowRight, User, Sparkles, BookOpen, Lock, Calendar } from 'lucide-react';
+import { HelpCircle, Bot, MapPin, Clock, CheckCircle2, XCircle, Paperclip, UserCheck, MessageSquare, Send, ArrowRight, User, Sparkles, BookOpen, Lock, Calendar, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface TicketDetailsDrawerProps {
@@ -254,24 +254,56 @@ export function TicketDetailsDrawer({
                 {ticket.attachments.map((att) => (
                   <div key={att.id} className="rounded-2xl border border-slate-200 bg-white p-3 space-y-2 shadow-xs">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-slate-800 truncate text-[11px]">{att.file_name}</span>
+                      <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                        <span className="font-bold text-slate-800 truncate text-[11px]">{att.file_name}</span>
+                        <a
+                          href={att.file_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-slate-400 hover:text-amber-600 transition-colors flex-shrink-0"
+                          title="Open full media in new tab"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
                       <span className="text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-300">
                         {att.file_type.toUpperCase()}
                       </span>
                     </div>
 
                     {att.file_type === 'photo' && (
-                      <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 max-h-48 flex items-center justify-center">
-                        <img src={att.file_url} alt={att.file_name} className="max-h-48 object-contain" />
+                      <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 max-h-56 flex items-center justify-center">
+                        <img
+                          src={att.file_url}
+                          alt={att.file_name}
+                          className="max-h-56 w-full object-cover"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            if (!target.src.includes('/demo-media/')) {
+                              target.src = `/demo-media/${att.file_name}`;
+                            }
+                          }}
+                        />
                       </div>
                     )}
 
                     {att.file_type === 'audio' && (
-                      <audio src={att.file_url} controls className="w-full h-10 rounded-xl" />
+                      <div className="rounded-xl bg-stone-50 border border-slate-200 p-2">
+                        <audio controls preload="metadata" className="w-full h-9">
+                          <source src={att.file_url} type="audio/wav" />
+                          <source src={att.file_url} type="audio/mpeg" />
+                          Your browser does not support audio playback.
+                        </audio>
+                      </div>
                     )}
 
                     {att.file_type === 'video' && (
-                      <video src={att.file_url} controls className="w-full max-h-48 rounded-xl bg-slate-900" />
+                      <div className="rounded-xl overflow-hidden border border-slate-200 bg-black">
+                        <video controls preload="metadata" playsInline className="w-full max-h-52 object-contain">
+                          <source src={att.file_url} type="video/mp4" />
+                          Your browser does not support video playback.
+                        </video>
+                      </div>
                     )}
                   </div>
                 ))}

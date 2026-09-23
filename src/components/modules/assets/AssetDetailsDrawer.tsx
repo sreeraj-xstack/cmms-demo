@@ -61,6 +61,32 @@ export function AssetDetailsDrawer({ asset, onClose, onStatusChange }: AssetDeta
             </button>
           </div>
 
+          {/* Machine Photo Visual Showcase */}
+          <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 relative group shadow-xs">
+            <img
+              src={(() => {
+                const t = (asset.machine_type || '').toLowerCase();
+                if (t.includes('edge')) return '/demo-media/edgebander_glue_pot.jpg';
+                if (t.includes('saw')) return '/demo-media/saw_blade_carriage.jpg';
+                if (t.includes('press')) return '/demo-media/hydraulic_press_valves.jpg';
+                if (t.includes('sand')) return '/demo-media/wide_belt_sander_drum.jpg';
+                if (t.includes('dust') || t.includes('baghouse')) return '/demo-media/dust_baghouse_manifold.jpg';
+                return '/demo-media/spindle_assembly.jpg';
+              })()}
+              alt={asset.name}
+              className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500"
+              onError={(e) => {
+                const target = e.currentTarget;
+                target.src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-3">
+              <span className="text-[10px] font-bold text-white tracking-wide uppercase bg-black/50 backdrop-blur-xs px-2.5 py-1 rounded-md border border-white/20">
+                {asset.manufacturer || 'HOMAG Group'} • {asset.machine_type}
+              </span>
+            </div>
+          </div>
+
           {/* Quick Status Control */}
           <div className="rounded-2xl border border-slate-200 bg-stone-50 p-4 space-y-2">
             <label className="text-xs font-bold text-slate-700 block">Operational Status</label>
